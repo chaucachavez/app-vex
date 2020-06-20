@@ -1,0 +1,152 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<div *ngIf="!loading">
+
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">Ventas</h2>
+
+      <button [matMenuTriggerFor]="settingsMenu" class="text-secondary" mat-icon-button type="button"
+        matTooltip="Más acciones" *ngIf="masivo.idestadodocumento === 27">
+        <mat-icon [icIcon]="icMoreVert"></mat-icon>
+      </button>
+
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" matTooltip="Cerrar">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <div class="px-gutter" gdColumns="1fr 1fr" gdColumns.xs="1fr" gdGap="16px" fxFlex="65">
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <div class="w-10 h-10 rounded-full bg-gray-50 text-dark ltr:mr-3 rtl:ml-3 flex items-center justify-center">
+            <ic-icon [icon]="icDomain" size="20px"></ic-icon>
+          </div>
+          <div>
+            <p class="m-0 body-1">{{masivo.sede.nombre}}</p>
+            <p class="m-0 caption text-hint">Local</p>
+          </div>
+        </div>
+
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <div class="w-10 h-10 rounded-full bg-gray-50 text-dark ltr:mr-3 rtl:ml-3 flex items-center justify-center">
+            <ic-icon [icon]="icToday" size="20px"></ic-icon>
+          </div>
+          <div>
+            <p class="m-0 body-1">{{masivo.fechaemision | date:'EEEE, d MMMM y'}}</p>
+            <p class="m-0 caption text-hint">Fecha emisión</p>
+          </div>
+        </div>
+
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <div class="w-10 h-10 rounded-full bg-gray-50 text-dark ltr:mr-3 rtl:ml-3 flex items-center justify-center">
+            <ic-icon [icon]="icInsertDriveFile" size="20px"></ic-icon>
+          </div>
+          <div>
+            <p class="m-0 body-1">{{masivo.cantidad}}</p>
+            <p class="m-0 caption text-hint">Comprobantes</p>
+          </div>
+        </div>
+
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <table class="table-hover">
+            <tbody>
+              <tr *ngFor="let item of masivo.masivodet">
+                <td class="text-center b-1">
+                  <!-- <p><small>Cant.</small></p> -->
+                  {{item.cantidad | number : '1.0-0'}}
+                </td>
+                <td class="b-1">
+                  {{item.nombre}} {{item.descripcion}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+      <div fxLayout="column" fxFlex="35">
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center center" fxLayoutAlign.xs="center stretch"
+          fxLayoutGap="6px" *ngIf="masivo.idestadodocumento === 27">
+          <button mat-raised-button type="button" (click)="downloadFile(masivo.xml);" color="accent"
+            class="rounded-full" matTooltip="Todo">
+            <ic-icon [icon]="icCloudDownload" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true" size="24px">
+            </ic-icon>
+            <span>Descargar</span>
+          </button>
+          <button mat-raised-button type="button" (click)="downloadFile(masivo.pdf);" color="primary"
+            class="rounded-full" matTooltip="Todo">
+            <ic-icon [icon]="icPrint" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true" size="24px">
+            </ic-icon>
+            <span>Imprimir</span>
+          </button>
+        </div>
+
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center center" fxLayoutAlign.xs="center stretch"
+          fxLayoutGap="6px" *ngIf="masivo.idestadodocumento === 28">
+          <p class="text-red-500 text-center">COMPROBANTES SE ENCUENTRAN ANULADOS</p>
+        </div>
+        <!-- <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center center" fxLayoutGap="6px">
+          <button mat-raised-button type="button" (click)="downloadFile(masivo.pdf);" color="primary"
+            class="rounded-full mt-2">
+            <ic-icon [icon]="icPrint" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true" size="24px">
+            </ic-icon>
+            <span>Bloques</span>
+          </button>
+        </div>  -->
+      </div>
+    </div>
+
+    <fieldset class="mt-4">
+      <div class="loading-container">
+        <table class="table-hover">
+          <thead>
+            <tr>
+              <th style="width: 45%" class="text-left">COMPROBANTE</th>
+              <th style="width: 15%" class="text-left">SERIE</th>
+              <th style="width: 15%" class="text-left">NUMERO</th>
+              <th style="width: 15%" class="text-left" fxHide.xs>TOTAL</th>
+              <th style="width: 10%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of masivo.ventas">
+              <td>{{item.docnegocio.nombre}}</td>
+              <td>{{item.serie}}</td>
+              <td>{{item.numero}}</td>
+              <td fxHide.xs>S/ {{item.total}}</td>
+              <td class="text-center">
+                <button mat-icon-button (click)="printPdf(item.pdf);" matTooltip="Imprimir"
+                  class="w-8 h-8 leading-none flex items-center justify-center hover:bg-hover"
+                  *ngIf="masivo.idestadodocumento === 27">
+                  <mat-icon [icIcon]="icPrint" size="18px"></mat-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </fieldset>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close aria-label="CERRAR">
+      CERRAR
+    </button>
+  </mat-dialog-actions>
+
+  <mat-menu #settingsMenu="matMenu" xPosition="before" yPosition="below">
+    <button mat-menu-item (click)="matDialogRef.close('anular')">
+      <mat-icon color="warn" [icIcon]="icBlock"></mat-icon>
+      Anular
+    </button>
+    <a mat-menu-item [href]="URL_PDF + masivo.pdf" target="_blank">
+      <mat-icon [icIcon]="icCallMade"></mat-icon>
+      PDF
+    </a>
+  </mat-menu>
+
+</div>

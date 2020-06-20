@@ -1,0 +1,41 @@
+<vex-loading *ngIf="submitted"></vex-loading>
+
+<form [formGroup]="correoForm" (ngSubmit)="save()">
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">Envío a correo</h2>
+    <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+    
+    <mat-form-field appearance="standard">
+      <mat-label>Comprobante</mat-label>
+      <input matInput formControlName="comprobante" [readonly]="true">
+    </mat-form-field> 
+
+    <mat-form-field appearance="fill" [floatLabel]="'always'">
+      <mat-label>Correo electrónico</mat-label>
+      <input matInput formControlName="cpecorreo" #correo required>
+      <mat-icon [icIcon]="icMail" class="mr-2" matPrefix></mat-icon>
+      <mat-error *ngIf="correoForm.get('cpecorreo').hasError('required')">
+        Es requerido
+      </mat-error>
+      <mat-error *ngIf="correoForm.get('cpecorreo').hasError('email')">
+        Correo inválido!
+      </mat-error>
+    </mat-form-field>
+    <!-- <pre>
+        {{correoForm.value | json}} 
+      </pre> -->
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">Cancelar</button>
+    <button color="primary" mat-raised-button type="submit" [disabled]="correoForm.invalid || submitted">Enviar</button>
+  </mat-dialog-actions>
+
+</form>

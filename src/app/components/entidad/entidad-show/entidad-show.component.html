@@ -1,0 +1,284 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<div class="dialog-content-wrapper" *ngIf="!loading">
+  <div mat-dialog-title class="m-0">
+    <mat-toolbar class="primary">
+      <mat-toolbar-row fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+        <span>{{entidad.entidad}}
+          <!-- {{dialogTitle}} -->
+        </span>
+        <div fxLayout="row" fxLayoutAlign="end center">
+          <button mat-icon-button type="button" matTooltip="Eliminar">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button mat-icon-button type="button" (click)="matDialogRef.close('edit')" aria-label="Editar"
+            matTooltip="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="matDialogRef.close()" aria-label="Close dialog">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </mat-toolbar-row>
+    </mat-toolbar>
+  </div>
+
+  <div mat-dialog-content class="p-0 m-0" fusePerfectScrollbar>
+    <div fxLayout="column" fxFlex>
+      <mat-tab-group [selectedIndex]="0" backgroundColor="accent">
+        <mat-tab label="PERSONA">
+          <div class="p-16">
+
+            <fieldset>
+              <legend>Persona</legend>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="20" class="font-weight-700">Documento</div>
+                <div fxFlex="30">{{entidad.documento?.abreviatura}}</div>
+                <div fxFlex="20" class="font-weight-700">Identificación</div>
+                <div fxFlex="30">{{entidad.numerodoc}}</div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start" *ngIf="entidad.iddocumento !== 2">
+                <div fxFlex="20" class="font-weight-700">A. Paterno</div>
+                <div fxFlex="30">{{entidad.apellidopat}}</div>
+                <div fxFlex="20" class="font-weight-700">A. Materno</div>
+                <div fxFlex="30">{{entidad.apellidomat}}</div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start" *ngIf="entidad.iddocumento !== 2">
+                <div fxFlex="20" class="font-weight-700">Nombre(s)</div>
+                <div fxFlex="30">{{entidad.nombre}}</div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start" *ngIf="entidad.iddocumento === 2">
+                <div fxFlex="20" class="font-weight-700">Razón social</div>
+                <div fxFlex="30">{{entidad.entidad}}</div>
+                <div fxFlex="20" class="font-weight-700">Abreviatura</div>
+                <div fxFlex="30">{{entidad.acronimo}}</div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start" *ngIf="entidad.iddocumento !== 2">
+                <div fxFlex="20" class="font-weight-700">Nacimiento</div>
+                <div fxFlex="30">{{entidad.fechanacimiento | date:'d MMM, yy'}}</div>
+                <div fxFlex="20" class="font-weight-700">Sexo</div>
+                <div fxFlex="30">{{entidad.sexo==='M'?'Masculino':'Femenino'}}</div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="20" class="font-weight-700">Teléfono</div>
+                <div fxFlex="30">{{entidad.telefono}}</div>
+                <div fxFlex="20" class="font-weight-700">Celular</div>
+                <div fxFlex="30">{{entidad.celular}}</div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="20" class="font-weight-700">Correo</div>
+                <div fxFlex="30">{{entidad.correo}}</div>
+                <div fxFlex="20" class="font-weight-700" *ngIf="entidad.iddocumento !== 2">Cargo</div>
+                <div fxFlex="30" *ngIf="entidad.iddocumento !== 2">{{entidad.cargoorg?.nombre}}</div>
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-16">
+              <legend>Dirección</legend>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="15" class="font-weight-700">Departamento</div>
+                <div fxFlex="19">{{entidad.idubigeo}}</div>
+                <div fxFlex="15" class="font-weight-700">Provincia</div>
+                <div fxFlex="18">{{entidad.idubigeo}}</div>
+                <div fxFlex="15" class="font-weight-700">Distrito</div>
+                <div fxFlex="18">{{entidad.idubigeo}}</div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="15" class="font-weight-700">Dirección</div>
+                <div fxFlex="85">{{entidad.direccion}}</div>
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-16">
+              <legend>Redes sociales</legend>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="20" class="font-weight-700">Facebook</div>
+                <div fxFlex="30">{{entidad.facebook}}</div>
+                <div fxFlex="20" class="font-weight-700">Twitter</div>
+                <div fxFlex="30">{{entidad.twitter}}</div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="20" class="font-weight-700">Página web</div>
+                <div fxFlex="30">{{entidad.paginaweb}}</div>
+                <div fxFlex="20" class="font-weight-700">Whatsapp</div>
+                <div fxFlex="30">{{entidad.whatsapp}}</div>
+              </div>
+            </fieldset>
+          </div>
+        </mat-tab>
+        <mat-tab label="EMPRESA">
+          <div class="p-16">
+            <fieldset class="fieldset-m-0">
+              <legend>Sedes donde labora</legend>
+              <table mat-table [dataSource]="dsSedes">
+                <ng-container matColumnDef="sede_nombre">
+                  <th mat-header-cell *matHeaderCellDef>SEDE</th>
+                  <td mat-cell *matCellDef="let element">{{element.nombre}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="sede_direccion">
+                  <th mat-header-cell *matHeaderCellDef>DIRECCIÓN </th>
+                  <td mat-cell *matCellDef="let element">{{element.direccion}} </td>
+                </ng-container>
+                <!-- empty column -->
+                <ng-container matColumnDef="empty">
+                  <td mat-footer-cell *matFooterCellDef colspan="2">
+                    <div fxLayout="row" fxLayoutAlign="center center">
+                      No hay registros.
+                    </div>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="dcSedes"></tr>
+                <tr mat-row *matRowDef="let row; columns: dcSedes;"></tr>
+                <tr mat-footer-row *matFooterRowDef="['empty']" [ngClass]="{'hide': dsSedes.length > 0}"></tr>
+              </table>
+            </fieldset>
+            <fieldset class="mt-16">
+              <legend>Refrigerio laboral</legend>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="30" class="font-weight-700">Hora inicio</div>
+                <div fxFlex="20">{{entidad.breakinicio}}</div>
+                <div fxFlex="30" class="font-weight-700">Hora fin</div>
+                <div fxFlex="20">{{entidad.breakfin}}</div>
+              </div>
+            </fieldset>
+            <fieldset class="mt-16">
+              <legend>Configuración en sistema</legend>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="30" class="font-weight-700">Usuario</div>
+                <div fxFlex="20">{{entidad.numerodoc}}</div>
+                <div fxFlex="30" class="font-weight-700">Perfil</div>
+                <div fxFlex="20">{{entidad.perfil?.nombre}}</div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="30" class="font-weight-700">Permitir acceso</div>
+                <div fxFlex="20">
+                  <mat-icon class="s-16" *ngIf="entidad.acceso === 0 || !entidad.acceso">check_box_outline_blank
+                  </mat-icon>
+                  <mat-icon class="s-16" *ngIf="entidad.acceso === 1">check</mat-icon>
+                </div>
+                <div fxFlex="30" class="font-weight-700">Validación por Ip</div>
+                <div fxFlex="20">
+                  <mat-icon class="s-16" *ngIf="entidad.validacionip === 0 || !entidad.validacionip">
+                    check_box_outline_blank</mat-icon>
+                  <mat-icon class="s-16" *ngIf="entidad.validacionip === 1">check</mat-icon>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="30" class="font-weight-700">Validación por horario</div>
+                <div fxFlex="20">
+                  <mat-icon class="s-16" *ngIf="entidad.validacionhorario === 0 || !entidad.validacionhorario">
+                    check_box_outline_blank</mat-icon>
+                  <mat-icon class="s-16" *ngIf="entidad.validacionhorario === 1">check</mat-icon>
+                </div>
+                <div fxFlex="30" class="font-weight-700">Administrar horario laboral</div>
+                <div fxFlex="20">
+                  <mat-icon class="s-16" *ngIf="entidad.admasistencia === 0 || !entidad.admasistencia">
+                    check_box_outline_blank</mat-icon>
+                  <mat-icon class="s-16" *ngIf="entidad.admasistencia === 1">check</mat-icon>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+                <div fxFlex="30" class="font-weight-700">Horario laboral</div>
+                <div fxFlex="20">
+                  <mat-icon class="s-16" *ngIf="entidad.horario === '0' || !entidad.horario">check_box_outline_blank
+                  </mat-icon>
+                  <mat-icon class="s-16" *ngIf="entidad.horario === '1'">check</mat-icon>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="PACIENTE">
+          <div class="p-16">
+            <fieldset class="fieldset-m-0">
+              <legend>Historia clínica por sedes</legend>
+              <table mat-table [dataSource]="dsHistorias">
+                <ng-container matColumnDef="sede_nombre">
+                  <th mat-header-cell *matHeaderCellDef>SEDE</th>
+                  <td mat-cell *matCellDef="let element">{{element.sede.nombre}} </td>
+                </ng-container>
+                <ng-container matColumnDef="hc">
+                  <th mat-header-cell *matHeaderCellDef>N° HISTORIA</th>
+                  <td mat-cell *matCellDef="let element">{{element.hc}} </td>
+                </ng-container>
+                <!-- empty column -->
+                <ng-container matColumnDef="empty">
+                  <td mat-footer-cell *matFooterCellDef colspan="2">
+                    <div fxLayout="row" fxLayoutAlign="center center">
+                      No hay registros.
+                    </div>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="dcHistorias"></tr>
+                <tr mat-row *matRowDef="let row; columns: dcHistorias;"></tr>
+                <tr mat-footer-row *matFooterRowDef="['empty']" [ngClass]="{'hide': dsHistorias.length > 0}"></tr>
+              </table>
+            </fieldset>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="MÉDICO">
+          <div class="p-16">
+            <fieldset class="fieldset-m-0">
+              <legend>Especialidades</legend>
+              <table mat-table [dataSource]="dsHistorias">
+                <ng-container matColumnDef="sede_nombre">
+                  <th mat-header-cell *matHeaderCellDef>SEDE</th>
+                  <td mat-cell *matCellDef="let element">{{element.sede.nombre}} </td>
+                </ng-container>
+                <ng-container matColumnDef="hc">
+                  <th mat-header-cell *matHeaderCellDef>ESPECIALIDAD</th>
+                  <td mat-cell *matCellDef="let element">{{element.hc}} </td>
+                </ng-container>
+                <!-- empty column -->
+                <ng-container matColumnDef="empty">
+                  <td mat-footer-cell *matFooterCellDef colspan="2">
+                    <div fxLayout="row" fxLayoutAlign="center center">
+                      No hay registros.
+                    </div>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="dcHistorias"></tr>
+                <tr mat-row *matRowDef="let row; columns: dcHistorias;"></tr>
+                <tr mat-footer-row *matFooterRowDef="['empty']" [ngClass]="{'hide': dsHistorias.length > 0}"></tr>
+              </table>
+            </fieldset>
+
+            <fieldset class="mt-16 fieldset-m-0">
+              <legend>Consulta médica</legend>
+              <table mat-table [dataSource]="dsHistorias">
+                <ng-container matColumnDef="sede_nombre">
+                  <th mat-header-cell *matHeaderCellDef>SEDE</th>
+                  <td mat-cell *matCellDef="let element">{{element.sede.nombre}} </td>
+                </ng-container>
+                <ng-container matColumnDef="hc">
+                  <th mat-header-cell *matHeaderCellDef>PRECIO</th>
+                  <td mat-cell *matCellDef="let element">{{element.hc}} </td>
+                </ng-container>
+                <!-- empty column -->
+                <ng-container matColumnDef="empty">
+                  <td mat-footer-cell *matFooterCellDef colspan="2">
+                    <div fxLayout="row" fxLayoutAlign="center center">
+                      No hay registros.
+                    </div>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="dcHistorias"></tr>
+                <tr mat-row *matRowDef="let row; columns: dcHistorias;"></tr>
+                <tr mat-footer-row *matFooterRowDef="['empty']" [ngClass]="{'hide': dsHistorias.length > 0}"></tr>
+              </table>
+            </fieldset>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+
+  <div mat-dialog-actions class="m-0" fxLayout="row" fxLayoutAlign="end center">
+    <button mat-button (click)="matDialogRef.close()" aria-label="CERRAR" color="accent">
+      CERRAR
+    </button>
+  </div>
+</div>

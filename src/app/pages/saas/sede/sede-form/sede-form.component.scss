@@ -1,0 +1,59 @@
+.sede-form-dialog {
+    @screen sm {
+        // width: 100%;
+    }
+
+    @screen md {
+        width: 680px;
+    }
+
+    .mat-dialog-container {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .mat-dialog-content {
+        padding: 0px 16px;
+        margin: 0px;
+    }
+
+    .mat-dialog-actions {
+        padding: 16px 24px;
+        margin: 0px;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    fieldset {
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        padding: 8px;
+
+        legend {
+            font-weight: 500;
+            padding: 0px 8px 0px 8px;
+        }
+    }
+
+    .example-panel-rojo {
+        background: rgba(255, 0, 0, 0.5) !important;
+        border: #000000 1px solid;
+    }
+
+    .example-panel-green.mat-select-panel {
+        background: rgba(0, 255, 0, 0.5) !important;
+    }
+
+    .example-panel-blue.mat-select-panel {
+        background: rgba(0, 0, 255, 0.5) !important;
+    }
+
+    .borde {
+        // border: #000000 1px solid;
+    }
+    .b-b-1 {
+        border-bottom: #cccccc 1px solid;
+    }
+}

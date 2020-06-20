@@ -1,0 +1,133 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<form [formGroup]="entidadForm" (ngSubmit)="save()" *ngIf="!loading">
+
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">{{dialogTitle}}</h2>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" matTooltip="Cerrar">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <mat-tab-group fxFlex="auto" #tabGroup (selectedTabChange)="handleTabChange($event)"
+      [selectedIndex]="activeTabIndex" [color]="'accent'" [backgroundColor]="'primary'">
+      <mat-tab label="GENERAL" *ngIf="tipo !== 'cliente'"></mat-tab>
+      <mat-tab label="PERSONAL" *ngIf="tipo === 'personal'"></mat-tab>
+      <mat-tab label="AFILIADO" *ngIf="tipo === 'afiliado'"></mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+    <div *ngIf="activeTabIndex === 0">
+      <fieldset fxLayout="column">
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <mat-form-field appearance="standard" floatLabel="always" floatLabel="always" fxFlex="50">
+            <mat-label>Documento</mat-label>
+            <mat-select formControlName="iddocumento" (selectionChange)="selectedDocumento($event.value)" required>
+              <!-- <mat-option [value]="null">Seleccione</mat-option> -->
+              <mat-option *ngFor="let documento of documentos" [value]="documento.iddocumento">
+                {{ documento.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="entidadForm.get('iddocumento').hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <div fxLayout="row" fxLayoutGap="8px" fxFlex="50">
+            <mat-form-field appearance="standard" floatLabel="always" class="vex-flex-form-field" fxFlex="auto">
+              <mat-label>Número</mat-label>
+              <input matInput formControlName="numerodoc" #numerodoc
+                (keydown.enter)="consultar(numerodoc.value); $event.preventDefault()" required>
+              <mat-error *ngIf="entidadForm.get('numerodoc').hasError('required')">
+                Es requerido
+              </mat-error>
+            </mat-form-field>
+            <div fxFlex="none">
+              <button mat-flat-button color="accent" type="button" style="width: 100%" [disabled]="searching || [8,11].indexOf(numerodoc.value?.length) === -1 || 
+                    (['10','20'].indexOf(numerodoc.value?.substring(0,2)) === -1 && numerodoc.value?.length === 11)"
+                (click)="consultar(numerodoc.value);" matTooltip="RUC o DNI en SUNAT">
+                <span *ngIf="!searching">Buscar</span>
+                <span *ngIf="searching">Buscando...</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <mat-form-field appearance="standard" floatLabel="always"
+          *ngIf="[2, 5].indexOf(entidadForm.controls['iddocumento'].value)  !== -1">
+          <mat-label>Razón social o nombre completo</mat-label>
+          <input matInput formControlName="entidad">
+          <mat-error *ngIf="entidadForm.get('entidad').hasError('required')">
+            Es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0"
+          *ngIf="[2, 5].indexOf(entidadForm.controls['iddocumento'].value)  === -1">
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Apellidos</mat-label>
+            <input matInput formControlName="apellidopat">
+            <mat-error *ngIf="entidadForm.get('apellidopat').hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Nombres</mat-label>
+            <input matInput formControlName="nombre">
+            <mat-error *ngIf="entidadForm.get('nombre').hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Dirección</mat-label>
+            <input matInput formControlName="direccion">
+          </mat-form-field>
+        </div>
+      </fieldset>
+      <fieldset fxLayout="column" class="mt-4">
+        <legend>Contacto</legend>
+
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Teléfono / celular</mat-label>
+            <input matInput type="tel" formControlName="telefono">
+          </mat-form-field>
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+            <mat-label>Correo</mat-label>
+            <input matInput formControlName="email">
+            <mat-error *ngIf="entidadForm.get('email').hasError('required')">
+              Correo es requerido
+            </mat-error>
+            <mat-error *ngIf="entidadForm.get('email').hasError('pattern')">
+              Formato es incorrecto!
+            </mat-error>
+            <mat-error *ngIf="!entidadForm.controls['email'].valid">
+              Correo inválido
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <!-- {{entidadForm.value | json}} -->
+      </fieldset>
+    </div>
+
+    <div *ngIf="activeTabIndex === 1 && tipo === 'personal'">
+      Estas en personal
+    </div>
+
+    <div *ngIf="activeTabIndex === 1 && tipo === 'afiliado'">
+      Estas en afilido
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button color="primary" mat-raised-button type="submit"
+      [disabled]="entidadForm.invalid || submitted">GUARDAR</button>
+  </mat-dialog-actions>
+
+</form>

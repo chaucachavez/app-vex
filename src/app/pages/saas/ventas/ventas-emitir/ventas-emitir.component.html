@@ -1,0 +1,539 @@
+<form id="ventas-emitir" [formGroup]="ventaForm" (ngSubmit)="emitir()">
+
+  <mat-toolbar color="primary">
+    <mat-toolbar-row fxLayoutAlign="space-between center" class="container">
+      <div fxLayout="row" fxLayoutAlign="center center">
+        <button mat-icon-button type="button" [routerLink]="'/ventas'" matTooltip="Volver">
+          <mat-icon [icIcon]="icArrowBack"></mat-icon>
+        </button>
+        <span *ngIf="!comprobante.value">comprobante electrónico</span>
+        <span *ngIf="comprobante.value">
+          <!-- {{comprobante.value.documentofiscal.nombre}} {{comprobante.value.serie}} - {{comprobante.value.numero}} -->
+          Nueva {{comprobante.value.documentofiscal.nombre}}
+        </span>
+        <!-- <div class="borde">
+          {{ventaForm.valid}}
+          {{ventaForm.status}} -
+          {{ventaForm.get('ventadet').status}}
+        </div> -->
+      </div>
+      <div>
+        <button mat-button type="button" (click)="modalGeneral();">
+          <mat-icon size="18px" [icIcon]="icSettings"></mat-icon> GENERAL
+        </button>
+        <button mat-button type="button" (click)="resetCliente();">
+          RESET CLIENTE
+        </button>
+        <!-- <button mat-button type="button" (click)="modalGuia();">
+          <mat-icon size="18px" [icIcon]="icInsertDriveFile"></mat-icon> GUÍA REMISIÓN
+        </button>
+        <button mat-button type="button" (click)="modalGuia();">
+          <mat-icon size="18px" [icIcon]="icInsertDriveFile"></mat-icon> COTIZACIÓN
+        </button> 
+        <button mat-button type="button" (click)="resetForm();">
+          <mat-icon size="18px" [icIcon]="icInsertDriveFile"></mat-icon> NOTA DE SALIDA
+        </button>
+        -->
+        <button mat-raised-button type="submit" class="mr-1" [disabled]="submitted" fxHide fxShow.gt-xs>
+          <mat-icon [icIcon]="icSend"></mat-icon> EMITIR
+        </button>
+        <button mat-icon-button type="submit" [disabled]="submitted" fxShow fxHide.gt-xs>
+          <mat-icon [icIcon]="icSave"></mat-icon>
+        </button>
+      </div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+
+  <div class="content container">
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+
+      <mat-card fxFlex="50">
+        <mat-card-content>
+          <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="66" class="vex-flex-form-field">
+              <mat-label>Comprobante</mat-label>
+              <mat-select [formControl]="comprobante">
+                <mat-option *ngFor="let item of comprobantes" [value]="item">
+                  <div fxLayout="row" fxLayoutAlign="space-between center">
+                    <span fxFlex="70">{{ item.documentofiscal.nombre}} </span>
+                    <span fxFlex="30">{{ item.serie }} - {{ item.numero }}</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="comprobante.hasError('required')">
+                Requerido!
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto" class="vex-flex-form-field">
+              <mat-label>Moneda</mat-label>
+              <mat-select formControlName="moneda">
+                <mat-option *ngFor="let item of monedas" [value]="item.moneda">
+                  {{ item.nombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="ventaForm.get('moneda').hasError('required')">
+                Requerido!
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="33" class="vex-flex-form-field">
+              <mat-label>Fecha emisión</mat-label>
+              <input matInput [matDatepicker]="fechaDatePicker" name="start" formControlName="fechaemision">
+              <mat-datepicker-toggle matSuffix [for]="fechaDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #fechaDatePicker></mat-datepicker>
+              <mat-error *ngIf="ventaForm.get('fechaemision').hasError('required')">
+                Requerido!
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="33" class="vex-flex-form-field">
+              <mat-label>Fecha vencimiento</mat-label>
+              <input matInput [matDatepicker]="fechaDatePickerVence" name="start" formControlName="fechavencimiento">
+              <mat-datepicker-toggle matSuffix [for]="fechaDatePickerVence"></mat-datepicker-toggle>
+              <mat-datepicker #fechaDatePickerVence></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="34" class="vex-flex-form-field">
+              <mat-label>Operación</mat-label>
+              <mat-select formControlName="operacion">
+                <mat-option *ngFor="let item of operaciones" [value]="item.operacion">
+                  {{ item.nombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="ventaForm.get('operacion').hasError('required')">
+                Requerido!
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto" class="vex-flex-form-field">
+              <mat-label>Guía de remisión</mat-label>
+              <input matInput formControlName="guiaremitente">
+            </mat-form-field>
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto" class="vex-flex-form-field">
+              <mat-label>Orden de compra</mat-label>
+              <input matInput formControlName="ordencompra">
+            </mat-form-field>
+          </div>
+
+          <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0"
+            *ngIf="comprobante.value && (comprobante.value.iddocumentofiscal === 13 || comprobante.value.iddocumentofiscal === 10)">
+            <button type="button" mat-flat-button color="accent" (click)="modalNotacredito()">
+              <span *ngIf="comprobante.value.iddocumentofiscal === 13">
+                Comprobante a emitir Nota de crédito
+              </span>
+              <span *ngIf="comprobante.value.iddocumentofiscal === 10">
+                Comprobante a emitir Nota de débito
+              </span>
+              <span *ngIf="ventaForm.get('documentonc').value === 1">
+                "Factura
+              </span>
+              <span *ngIf="ventaForm.get('documentonc').value === 2">
+                "Boleta de venta
+              </span>
+              <span *ngIf="ventaForm.get('documentonc').value">
+                {{ventaForm.get('serienc').value}} - {{ventaForm.get('numeronc').value}}"
+              </span>
+            </button>
+          </div>
+
+          <!-- <pre>
+                  {{ventaForm.value | json}} 
+              </pre> -->
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card fxFlex="50">
+        <mat-card-content>
+          <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+            <div fxLayout="row" fxLayoutGap="8px" fxFlex="100">
+              <mat-form-field appearance="standard" floatLabel="always" class="vex-flex-form-field" fxFlex="auto">
+                <mat-label>Cliente</mat-label>
+                <input matInput [matAutocomplete]="autoCliente" [formControl]="cliente">
+                <mat-autocomplete autoActiveFirstOption #autoCliente="matAutocomplete"
+                  [displayWith]="displaySearchEntidad"
+                  (optionSelected)="autocompletadoClienteSelected($event.option.value)">
+                  <mat-option *ngIf="isLoadingSearch" class="p-3" value="">
+                    <mat-spinner diameter="25"></mat-spinner>
+                  </mat-option>
+                  <ng-container *ngIf="!isLoadingSearch">
+                    <mat-option *ngFor="let state of searchResult.data" [value]="state" [ngSwitch]="state.iddocumento">
+                      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <div fxLayout="column" fxLayoutAlign="center start">
+                          <ic-icon [icIcon]="icAccountCircle" size="24px"
+                            *ngIf="[1,3,4,5,6,7].indexOf(state.iddocumento) !== -1"></ic-icon>
+                          <ic-icon [icIcon]="icDomain" size="24px" *ngIf="state.iddocumento === 2"></ic-icon>
+                        </div>
+                        <div fxLayout="column" fxLayoutAlign="center stretch">
+                          <small>{{ state.entidad }}</small>
+                          <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                            <small class="text-secondary inline-block" *ngSwitchCase="1">DNI</small>
+                            <small class="text-secondary inline-block" *ngSwitchCase="2">RUC</small>
+                            <small class="text-secondary inline-block" *ngSwitchCase="3">C.Ext.</small>
+                            <small class="text-secondary inline-block" *ngSwitchCase="4">Pasap.</small>
+                            <small class="text-secondary inline-block" *ngSwitchCase="5">Sin D.</small>
+                            <small class="text-secondary inline-block" *ngSwitchDefault>Identificación</small>
+                            <small class="text-secondary">{{ state.numerodoc }}</small>
+                          </div>
+                        </div>
+                      </div>
+                    </mat-option>
+                    <div fxLayout="row">
+                      <small class="p-3">Mostrando {{searchResult.to}} de {{searchResult.total}} resultados.</small>
+                    </div>
+                  </ng-container>
+                </mat-autocomplete>
+                <mat-icon [icIcon]="icSearch" matSuffix *ngIf="!cliente.value"></mat-icon>
+                <mat-icon [icIcon]="icClose" matSuffix *ngIf="cliente.value" (click)="cliente.setValue('');"
+                  class="cursor-pointer"></mat-icon>
+                <mat-error *ngIf="cliente.hasError('required')">
+                  Requerido
+                </mat-error>
+              </mat-form-field>
+              <div fxFlex="none">
+                <!-- <button mat-flat-button color="primary" type="button" (click)="newEntidad()">
+                  NUEVO
+                </button> -->
+                <button type="button" mat-mini-fab color="primary" (click)="newEntidad()" matTooltip="Nuevo cliente">
+                  <mat-icon [icIcon]="icAdd"></mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="35"
+              [ngSwitch]="ventaForm.get('clientedoc').value">
+              <mat-label *ngSwitchCase="1">DNI</mat-label>
+              <mat-label *ngSwitchCase="2">RUC</mat-label>
+              <mat-label *ngSwitchCase="3">C.Extranjeria</mat-label>
+              <mat-label *ngSwitchCase="4">Pasaporte</mat-label>
+              <mat-label *ngSwitchCase="5">Sin Documento</mat-label>
+              <mat-label *ngSwitchDefault>DNI / RUC / Otros</mat-label>
+              <input matInput name="clientenumerodoc" formControlName="clientenumerodoc">
+
+              <mat-icon [icIcon]="icSearch" matSuffix *ngIf="!ventaForm.get('clientenumerodoc').value"></mat-icon>
+              <mat-icon [icIcon]="icClose" matSuffix *ngIf="ventaForm.get('clientenumerodoc').value"
+                (click)="ventaForm.get('clientenumerodoc').setValue(''); cliente.setValue('');" class="cursor-pointer">
+              </mat-icon>
+
+            </mat-form-field>
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="65">
+              <mat-label>Correo</mat-label>
+              <input matInput formControlName="cpecorreo">
+            </mat-form-field>
+          </div>
+          <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="100">
+              <mat-label>Dirección</mat-label>
+              <input matInput formControlName="clientedireccion">
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <mat-card fxFlex="auto" class="mt-4">
+        <mat-card-content>
+          <div formArrayName="ventadet">
+
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+              fxLayoutGap="8px" fxLayoutGap.lt-sm="0">
+              <div fxFlex="43">Producto - servicio</div>
+              <div fxFlex="12">Detalle adicional</div>
+              <div fxFlex="7">Cantidad</div>
+              <div fxFlex="7">Tipo Igv</div>
+              <div fxFlex="7">P. Unit.</div>
+              <div fxFlex="7">Sub total</div>
+              <div fxFlex="7">Total</div>
+              <div fxFlex="10" fxLayout="row" fxLayoutAlign="center center">
+                <button type="button" mat-icon-button (click)="addItem()" matTooltip="Agregar linea"
+                  class="w-8 h-8 leading-none flex items-center justify-center ml-1 hover:bg-hover">
+                  <mat-icon [icIcon]="icAdd" size="18px"></mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+              fxLayoutGap="8px" fxLayoutGap.lt-sm="0" *ngFor="let control of ventadet.controls; index as i"
+              [formGroupName]="i">
+
+              <mat-form-field appearance="standard" floatLabel="always" fxFlex="43" class="vex-flex-form-field">
+                <mat-label *ngIf="control.get('producto').value">{{control.get('producto').value.codigo}}</mat-label>
+                <input matInput [matAutocomplete]="auto" formControlName="producto" placeholder="Buscar">
+                <!-- panelWidth="600px" -->
+                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayProductoFn"
+                  (optionSelected)="autocompletadoProductoSelected(control)">
+                  <mat-option *ngIf="control.get('datalistloading').value" class="p-3" value="">
+                    <mat-spinner diameter="25"></mat-spinner>
+                  </mat-option>
+                  <ng-container *ngIf="!control.get('datalistloading').value">
+                    <mat-option *ngFor="let item of control.get('datalist').value" [value]="item">
+                      <div fxLayout="column" fxLayoutAlign="center start">
+                        <small>{{ item.nombre}}</small>
+                        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                          <small class="text-secondary inline-block">Precio</small>
+                          <small class="text-secondary">{{ item.precio }}</small>
+                        </div>
+                      </div>
+                    </mat-option>
+                  </ng-container>
+                </mat-autocomplete>
+
+                <mat-icon [icIcon]="icSearch" matSuffix *ngIf="!control.get('producto').value"></mat-icon>
+                <mat-icon [icIcon]="icClose" matSuffix *ngIf="control.get('producto').value"
+                  (click)="control.get('producto').setValue('');" class="cursor-pointer"></mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="standard" floatLabel="always" fxFlex="12" class="vex-flex-form-field">
+                <input matInput formControlName="descripcion">
+              </mat-form-field>
+
+              <mat-form-field appearance="standard" floatLabel="always" fxFlex="7" class="vex-flex-form-field">
+                <input matInput type="number" formControlName="cantidad">
+              </mat-form-field>
+
+              <mat-form-field appearance="standard" floatLabel="always" fxFlex="7" class="vex-flex-form-field">
+                <mat-select formControlName="idimpuesto">
+                  <mat-option *ngFor="let item of impuestos" [value]="item.idimpuesto">
+                    {{ item.nombre }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="standard" floatLabel="always" fxFlex="7" class="vex-flex-form-field">
+                <input matInput type="number" formControlName="preciounit">
+              </mat-form-field>
+
+              <mat-form-field appearance="standard" floatLabel="always" fxFlex="7" class="vex-flex-form-field">
+                <input matInput type="number" formControlName="valorventa">
+              </mat-form-field>
+
+              <!-- vex-dense-form-field -->
+              <!-- vex-flex-form-fiel -->
+              <mat-form-field appearance="standard" floatLabel="always" fxFlex="7" class="vex-flex-form-field">
+                <input matInput type="number" formControlName="total" class="text-right">
+              </mat-form-field>
+
+              <div fxLayout="row" fxLayoutAlign="center center" fxFlex="10" #addListOriginRef>
+                <button type="button" mat-icon-button (click)="deleteItem(i)" matTooltip="Eliminar"
+                  class="w-8 h-8 leading-none flex items-center justify-center hover:bg-hover">
+                  <mat-icon [icIcon]="icDelete" size="18px"></mat-icon>
+                </button>
+
+                <button type="button" mat-icon-button (click)="openAddList(control, addListTemplate, addListOriginRef)"
+                  matTooltip="Editar" class="w-8 h-8 leading-none flex items-center justify-center ml-1 hover:bg-hover">
+                  <mat-icon [icIcon]="icEdit" size="18px"></mat-icon>
+                </button>
+
+                <ng-template #addListTemplate let-close="close">
+                  <div fxLayout="column" class="card px-4 pt-3 pb-2">
+                    <div fxLayout="row" fxLayoutAlign="end center">
+                      <button (click)="close()" class="text-secondary w-8 h-8 leading-none" mat-icon-button
+                        type="button">
+                        <mat-icon [icIcon]="icClose" size="18px"></mat-icon>
+                      </button>
+                    </div>
+                    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                      <div fxFlex="auto" fxLayout="row" fxLayoutAlign="center start">
+                        <mat-slide-toggle formControlName="bolsa" labelPosition="after">
+                        </mat-slide-toggle>
+                      </div>
+                      <mat-form-field appearance="standard" floatLabel="always" fxFlex="80">
+                        <mat-label>Impuesto a bolsa plástica</mat-label>
+                        <input matInput type="number" formControlName="impuestobolsa">
+                      </mat-form-field>
+                    </div>
+                    <!-- <mat-slide-toggle formControlName="bolsa" labelPosition="after">Bolsa plástica
+                    </mat-slide-toggle> 
+                    <mat-form-field appearance="standard" floatLabel="always" class="mt-3">
+                      <mat-label>Impuesto a bolsa plástica de Lima</mat-label>
+                      <input matInput type="number" formControlName="impuestobolsa">
+                    </mat-form-field> -->
+                    <mat-form-field appearance="standard" floatLabel="always">
+                      <mat-label>Descuento (Aplica al Sub total)</mat-label>
+                      <input matInput type="number" formControlName="descuento">
+                    </mat-form-field>
+                    <!-- class="vex-dense-form-field" -->
+                    <mat-form-field appearance="standard" floatLabel="always">
+                      <mat-label>IGV de ítem</mat-label>
+                      <input matInput type="number" formControlName="montototalimpuestos">
+                    </mat-form-field>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+
+            <div fxLayout="row" fxLayoutAlign="center center" *ngIf="ventaForm.get('ventadet').hasError('required')"
+              class="mt-4">
+              <button mat-stroked-button class="w-full" (click)="addItem()" matTooltip="Agregar linea">
+                <mat-icon [icIcon]="icAdd" size="18px"></mat-icon>
+              </button>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0" class="mt-4">
+            <div fxLayout="column" fxLayoutAlign="space-between" fxFlex="50" class="borde">
+
+              <div fxLayout="column" fxLayoutAlign="start start" class="borde">
+                <button mat-button type="button" (click)="newProducto();">Nuevo producto
+                </button>
+              </div>
+
+              <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0" class="borde">
+                <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto" class="vex-dense-form-field">
+                  <mat-label>Condiciones de pago</mat-label>
+                  <input matInput formControlName="condicionpago">
+                </mat-form-field>
+
+                <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto" class="vex-dense-form-field">
+                  <mat-label>Observaciones</mat-label>
+                  <input matInput formControlName="observacion">
+                </mat-form-field>
+              </div>
+            </div>
+            <div fxFlex="50" class="borde">
+              <div>
+                <div fxLayout="column" fxLayout.gt-xs="row">
+                  <div fxFlex="80" class="text-right">
+                    Descuento global <strong>%</strong>
+                  </div>
+                  <div fxFlex="20" class="text-right">
+                    <input matInput type="number" formControlName="descuentoporcentaje"
+                      style="border-bottom: 1px solid #CCC; width: 80px;">
+                  </div>
+                </div>
+                <div fxLayout="column" fxLayout.gt-xs="row" class="mt-1">
+                  <div fxFlex="80" class="text-right">
+                    Otros cargos S/
+                  </div>
+                  <div fxFlex="20" class="text-right">
+                    <input matInput type="number" formControlName="cargo"
+                      style="border-bottom: 1px solid #CCC; width: 80px;">
+                  </div>
+                </div>
+                <!-- <div fxLayout="column" fxLayout.gt-xs="row">
+                  <div fxFlex="70" class="text-right">
+                     Descuento global (-) S/
+                  </div>
+                  <div fxFlex="30" class="text-right">
+                    {{ventaForm.get('descuentoglobal').value | number : '1.2-2'}}
+                  </div>
+                </div>
+                <div fxLayout="column" fxLayout.gt-xs="row">
+                  <div fxFlex="70" class="text-right">
+                     Descuento por ítem (-) S/
+                  </div>
+                  <div fxFlex="30" class="text-right">
+                    {{ventaForm.get('descuentoitem').value | number : '1.2-2'}}
+                  </div>
+                </div>
+                 -->
+                <div fxLayout="column" fxLayout.gt-xs="row" *ngIf="ventaForm.get('descuentototal').value > 0">
+                  <div fxFlex="70" class="text-right">
+                    Descuento total (-) S/
+                  </div>
+                  <div fxFlex="30" class="text-right">
+                    {{ventaForm.get('descuentototal').value | number : '1.2-2'}}
+                  </div>
+                </div>
+                <!-- 
+                <div fxLayout="column" fxLayout.gt-xs="row">
+                  <div fxFlex="70" class="text-right">
+                     Anticipo (-) S/
+                  </div>
+                  <div fxFlex="30" class="text-right">
+                    ##.##
+                  </div>
+                </div>
+                 -->
+                <div fxLayout="column" fxLayout.gt-xs="row" *ngIf="this.leyenda.exonerada">
+                  <div fxFlex="80" class="text-right">
+                    Exonerada S/
+                  </div>
+                  <div fxFlex="20" class="text-right">
+                    {{ventaForm.get('exonerada').value | number : '1.2-2'}}
+                  </div>
+                </div>
+                <div fxLayout="column" fxLayout.gt-xs="row" *ngIf="this.leyenda.inafecta">
+                  <div fxFlex="80" class="text-right">
+                    Inafecta S/
+                  </div>
+                  <div fxFlex="20" class="text-right">
+                    {{ventaForm.get('inafecta').value | number : '1.2-2'}}
+                  </div>
+                </div>
+                <div fxLayout="column" fxLayout.gt-xs="row" *ngIf="this.leyenda.gratuita">
+                  <div fxFlex="80" class="text-right">
+                    Gratuita S/
+                  </div>
+                  <div fxFlex="20" class="text-right">
+                    {{ventaForm.get('gratuita').value | number : '1.2-2'}}
+                  </div>
+                </div>
+
+                <div fxLayout="column" fxLayout.gt-xs="row">
+                  <div fxFlex="80" class="text-right">
+                    Gravada S/
+                  </div>
+                  <div fxFlex="20" class="text-right">
+                    {{ventaForm.get('gravada').value | number : '1.2-2'}}
+                  </div>
+                </div>
+                <div fxLayout="column" fxLayout.gt-xs="row">
+                  <div fxFlex="80" class="text-right">
+                    IGV S/
+                  </div>
+                  <div fxFlex="20" class="text-right">
+                    {{ventaForm.get('valorimpuesto').value | number : '1.2-2'}}
+                  </div>
+                </div>
+                <div fxLayout="column" fxLayout.gt-xs="row" *ngIf="this.leyenda.icpber">
+                  <div fxFlex="80" class="text-right">
+                    ICBPER
+                  </div>
+                  <div fxFlex="20" class="text-right">
+                    {{ventaForm.get('totalimpuestobolsa').value | number : '1.2-2'}}
+                  </div>
+                </div>
+                <div fxLayout="column" fxLayout.gt-xs="row">
+                  <div fxFlex="80" class="text-right font-weight-600">
+                    <strong>Total S/</strong>
+                  </div>
+                  <div fxFlex="20" class="text-right">
+                    <strong>{{ventaForm.get('total').value | number : '1.2-2'}}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions fxLayout="row" fxLayoutAlign="end center">
+          <!-- [disabled]="ventaForm.invalid || submitted" -->
+          <button mat-raised-button color="primary" type="submit" [disabled]="submitted" class="w-full">
+            <mat-icon [icIcon]="icSend"></mat-icon> EMITIR
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <mat-card fxFlex="auto" class="mt-4">
+        <mat-card-content>
+          <!-- <pre>
+            {{cliente.value | json}} 
+          </pre>
+          <pre>
+            {{comprobante.value | json}}
+          </pre> -->
+          <pre>
+            {{ventaForm.value | json}} 
+          </pre>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+  </div>
+</form>

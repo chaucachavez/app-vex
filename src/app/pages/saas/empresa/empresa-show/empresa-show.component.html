@@ -1,0 +1,39 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<div *ngIf="!loading">
+
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">Empresa</h2>
+      <button class="text-secondary" mat-icon-button type="button" (click)="matDialogRef.close('delete')"
+        matTooltip="Eliminar">
+        <mat-icon [icIcon]="icDelete"></mat-icon>
+      </button>
+      <button class="text-secondary" mat-icon-button type="button" (click)="matDialogRef.close('edit')"
+        matTooltip="Editar">
+        <mat-icon [icIcon]="icEdit"></mat-icon>
+      </button>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" matTooltip="Cerrar">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+    <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+      <div fxFlex="20" class="font-weight-700">Ruc</div>
+      <div fxFlex="80">{{empresa.ruc}}</div>
+    </div>
+    <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+      <div fxFlex="20" class="font-weight-700">Nombre</div>
+      <div fxFlex="80">{{empresa.nombre}}</div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close aria-label="CERRAR">
+      CERRAR
+    </button>
+  </mat-dialog-actions>
+
+</div>

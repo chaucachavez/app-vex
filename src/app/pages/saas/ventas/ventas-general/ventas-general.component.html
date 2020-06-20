@@ -1,0 +1,87 @@
+<form [formGroup]="generalForm" (ngSubmit)="save()">
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">Datos generales</h2>
+    <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+    <!-- <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <mat-form-field appearance="standard" fxFlex="50">
+        <mat-label>Fecha vencimiento</mat-label>
+        <input matInput [matDatepicker]="fechaDatePicker" name="start" formControlName="fechavencimiento">
+        <mat-datepicker-toggle matSuffix [for]="fechaDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #fechaDatePicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="standard" fxFlex="50">
+        <mat-label>Tipo de operación</mat-label>
+        <mat-select formControlName="operacion">
+          <mat-option *ngFor="let item of operaciones" [value]="item.operacion">
+            {{ item.nombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div> -->
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+
+      <mat-form-field appearance="standard" fxFlex="auto">
+        <mat-label>Placa de vehículo</mat-label>
+        <input matInput formControlName="placavehiculo">
+      </mat-form-field>
+
+      <mat-form-field appearance="standard" fxFlex="auto">
+        <mat-label>Formato impresión</mat-label>
+        <mat-select formControlName="pdfformato">
+          <mat-option *ngFor="let item of formatos" [value]="item.id">
+            {{ item.nombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <mat-form-field appearance="standard" fxFlex="auto">
+        <mat-label>Guía transportista</mat-label>
+        <input matInput formControlName="guiatransportista">
+      </mat-form-field>
+      <mat-form-field appearance="standard" fxFlex="auto">
+        <mat-label>Tipo de cambio</mat-label>
+        <input matInput type="number" formControlName="tipocambio">
+      </mat-form-field>
+    </div>
+    <!-- <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <mat-form-field appearance="standard" fxFlex="auto">
+        <mat-label>Guía remitente</mat-label>
+        <input matInput formControlName="guiaremitente">
+      </mat-form-field>
+      <mat-form-field appearance="standard" fxFlex="auto">
+        <mat-label>Orden de compra</mat-label>
+        <input matInput formControlName="ordencompra">
+      </mat-form-field>
+    </div> -->
+
+    <fieldset>
+      <div fxLayout="column">
+        <mat-slide-toggle formControlName="detraccion"> Comprobante sujeto a detracción?
+        </mat-slide-toggle>
+        <mat-slide-toggle formControlName="selvaproducto"> Bienes región selva?
+        </mat-slide-toggle>
+        <mat-slide-toggle formControlName="selvaservicio"> Servicios región selva?
+        </mat-slide-toggle>
+      </div>
+    </fieldset>
+
+  </mat-dialog-content>
+
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button color="primary" mat-raised-button type="submit" [disabled]="generalForm.invalid">ACEPTAR</button>
+  </mat-dialog-actions>
+
+</form>

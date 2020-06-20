@@ -1,0 +1,176 @@
+<vex-page-layout>
+  <vex-page-layout-header class="pb-16" fxLayout="column" fxLayoutAlign="center start">
+    <div class="w-full flex flex-col sm:flex-row justify-between px-gutter">
+      <div>
+        <h1 class="title mt-0 mb-1" (click)="index(true);">Ventas por lote</h1>
+        <!-- <vex-breadcrumbs [crumbs]="['Masivos']"></vex-breadcrumbs> -->
+      </div>
+      <div>
+        <button mat-raised-button type="button" (click)="newMasivo()" fxHide fxShow.gt-xs>
+          <mat-icon [icIcon]="icAdd"></mat-icon> Nuevo
+        </button>
+        <button mat-icon-button type="button" (click)="newMasivo()" fxShow fxHide.gt-xs>
+          <mat-icon [icIcon]="icAdd"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </vex-page-layout-header>
+
+  <vex-page-layout-content class="-mt-6 px-gutter">
+
+    <div class="card overflow-auto -mt-16">
+      <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+
+        <div class="bg-card rounded-full border px-4" fxFlex="25" fxFlex.lt-md="auto" fxLayout="row"
+          fxLayoutAlign="start center">
+          <!-- <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto" class="vex-dense-form-field">
+            <mat-label>Local</mat-label> -->
+          <mat-select [formControl]="sede" class="px-4 py-3 border-0 outline-none bg-transparent">
+            <mat-option value="">Todos</mat-option>
+            <mat-option *ngFor="let item of sedes" [value]="item.idsede">
+              {{ item.nombre }}
+            </mat-option>
+          </mat-select>
+          <!-- </mat-form-field> -->
+        </div>
+
+        <span fxFlex></span>
+
+        <div class="bg-card rounded-full border px-4" fxFlex="290px" fxFlex.lt-md="auto" fxHide.xs fxLayout="row"
+          fxLayoutAlign="start center">
+          <input matInput placeholder="Desde" name="fechaemisionFrom" [formControl]="fechaemisionFrom"
+            [matDatepicker]="fechaFromDatePicker" class="px-4 py-3 border-0 outline-none w-full bg-transparent">
+          <mat-datepicker-toggle matSuffix [for]="fechaFromDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #fechaFromDatePicker></mat-datepicker>
+
+          <input matInput placeholder="Hasta" name="fechaemisionTo" [formControl]="fechaemisionTo"
+            [matDatepicker]="fechaToDatePicker">
+          <mat-datepicker-toggle matSuffix [for]="fechaToDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #fechaToDatePicker></mat-datepicker>
+        </div>
+
+      </div>
+
+      <div class="loading-container">
+        <div class="loading-shade" *ngIf="loadMasivo">
+          <mat-spinner></mat-spinner>
+        </div>
+        <table mat-table #table [dataSource]="dsMasivo" #sortMasivo="matSort" matSort matSortActive="id"
+          matSortDisableClear matSortDirection="desc" class="w-full">
+
+          <ng-container matColumnDef="sede">
+            <th mat-header-cell *matHeaderCellDef>LOCAL</th>
+            <td mat-cel *matCellDef="let element">
+              <div>{{element.sede.nombre}}</div>
+              <!-- <small><strong>Sábado,</strong> 2 de mayo</small> -->
+              <small>{{element.fechaemision | date:'EEEE, d MMMM'}}</small>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="fechaemision">
+            <th mat-header-cell *matHeaderCellDef>F.EMISIÓN</th>
+            <td mat-cel *matCellDef="let element">
+              {{element.fechaemision | date:'dd/MM/y'}}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="iddocumentofiscal">
+            <th mat-header-cell *matHeaderCellDef>COMPROBANTE</th>
+            <td mat-cel *matCellDef="let element"> {{element.docnegocio.nombre}}</td>
+          </ng-container>
+
+          <td mat-cel *matCellDef="let element"> {{element.serie}}</td>
+          <ng-container matColumnDef="serie">
+            <th mat-header-cell *matHeaderCellDef>SERIE</th>
+            <td mat-cel *matCellDef="let element"> {{element.serie}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="numerodel">
+            <th mat-header-cell *matHeaderCellDef>NÚMERO</th>
+            <td mat-cel *matCellDef="let element" class="text-center"> {{element.numerodel}} <small>al</small>
+              {{element.numeroal}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="numeroal">
+            <th mat-header-cell *matHeaderCellDef>AL</th>
+            <td mat-cel *matCellDef="let element"> {{element.numeroal}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="progreso">
+            <th mat-header-cell *matHeaderCellDef>PROGRESO</th>
+            <td mat-cel *matCellDef="let element">
+              <mat-progress-bar color="accent" [mode]="'determinate'" [value]="element.progressbar">
+              </mat-progress-bar>
+              {{element.progreso}} de {{element.cantidad}}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="detalle">
+            <th mat-header-cell *matHeaderCellDef class="text-center">DETALLE</th>
+            <td *matCellDef="let element">
+              <fieldset>
+                <table class="table-hover">
+                  <tbody>
+                    <tr *ngFor="let item of element.masivodet">
+                      <td style="width: 40px;" class="text-center">{{item.cantidad | number : '1.0-0'}}</td>
+                      <td style="width: 200px;">{{item.nombre}} {{item.descripcion}}</td>
+                      <td class="text-center">S/ {{item.total}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </fieldset>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="cantidad">
+            <th mat-header-cell *matHeaderCellDef>CANTIDAD</th>
+            <td mat-cel *matCellDef="let element" class="text-center">
+              {{element.cantidad}}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>
+
+            </th>
+            <td mat-cell *matCellDef="let item">
+              <div fxLayout="row" fxLayoutAlign="center center" *ngIf="item.idestadodocumento === 27">
+                <button type="button" mat-icon-button (click)="$event.stopPropagation(); printPdf(item.pdf);"
+                  matTooltip="Descargar" class="w-8 h-8 leading-none flex items-center justify-center hover:bg-hover">
+                  <mat-icon [icIcon]="icCloudDownload" size="18px"></mat-icon>
+                </button>
+
+                <button type="button" mat-icon-button (click)="$event.stopPropagation(); printPdf(item.pdf);"
+                  matTooltip="Imprimir"
+                  class="w-8 h-8 leading-none flex items-center justify-center ml-1 hover:bg-hover">
+                  <mat-icon [icIcon]="icPrint" size="18px"></mat-icon>
+                </button>
+              </div>
+
+              <div fxLayout="row" fxLayoutAlign="center center" *ngIf="item.idestadodocumento === 28">
+                <p class="text-red-500 text-center">ANULADO</p>
+              </div>
+
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="empty">
+            <mat-footer-cell *matFooterCellDef>
+              No hay registros.
+            </mat-footer-cell>
+          </ng-container>
+
+          <tr *matHeaderRowDef="dcMasivo" mat-header-row></tr>
+          <tr *matRowDef="let row; columns: dcMasivo;" (click)="showMasivo(row)"
+            class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+          <tr mat-footer-row *matFooterRowDef="['empty']" [ngClass]="{'hide': rLengthMasivo > 0 || loadMasivo}">
+          </tr>
+        </table>
+        <mat-paginator #pagMasivo [length]="rLengthMasivo" [pageSizeOptions]="pSizeOptMasivo" [pageSize]="pSizeMasivo">
+        </mat-paginator>
+      </div>
+    </div>
+
+  </vex-page-layout-content>
+
+</vex-page-layout>

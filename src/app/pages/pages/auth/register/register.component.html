@@ -1,0 +1,56 @@
+<div class="w-full h-full bg-pattern" fxLayout="column" fxLayoutAlign="center center">
+  <div @fadeInUp class="card overflow-hidden w-full max-w-xs">
+    <vex-loading *ngIf="submitted"></vex-loading>
+    <div class="p-6 pb-0" fxLayout="column" fxLayoutAlign="center center">
+      <div class="fill-current text-center">
+        <img class="w-20" src="assets/img/logos/logo_cuadrado.png">
+        <!-- <img class="w-16" src="assets/img/demo/logo.svg"> -->
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <h2 class="title m-0">Crea tu cuenta</h2>
+      <h4 class="body-2 text-secondary m-0">Software contable y planillas</h4>
+    </div>
+
+    <!-- <div [formGroup]="registerForm" class="p-6" fxLayout="column" fxLayoutGap="16px"> -->
+    <form [formGroup]="registerForm" class="p-6" fxLayout="column" (ngSubmit)="save()">
+      <div fxFlex="auto" fxLayout="column">
+        <mat-form-field fxFlex="grow">
+          <mat-label>Ruc</mat-label>
+          <input type="number" formControlName="ruc" matInput required>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="grow">
+          <mat-label>Correo</mat-label>
+          <input formControlName="email" matInput required>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="grow">
+          <mat-label>Teléfono</mat-label>
+          <input formControlName="celular" matInput required>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="grow">
+          <mat-label>Contraseña</mat-label>
+          <input [type]="inputType" formControlName="password" matInput required>
+          <button (click)="toggleVisibility()" mat-icon-button matSuffix matTooltip="Ver contraseña" type="button">
+            <mat-icon *ngIf="visible" [icIcon]="icVisibility"></mat-icon>
+            <mat-icon *ngIf="!visible" [icIcon]="icVisibilityOff"></mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="center center">
+        <mat-checkbox class="caption">Acepto recibir información del Software</mat-checkbox>
+      </div>
+      <button color="primary" mat-raised-button [disabled]="registerForm.invalid || submitted" class="mt-4">
+        CREAR CUENTA
+      </button>
+      <p class="text-secondary text-center mt-4">
+        ¿Ya tienes una una cuenta?
+      </p>
+      <a mat-button [routerLink]="['/login']">INGRESAR</a>
+    </form>
+  </div>
+</div>

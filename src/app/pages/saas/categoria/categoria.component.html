@@ -1,0 +1,108 @@
+<vex-page-layout>
+  <vex-page-layout-header class="pb-16" fxLayout="column" fxLayoutAlign="center start">
+    <div class="w-full flex flex-col sm:flex-row justify-between px-gutter">
+      <div>
+        <h1 class="title mt-0 mb-1">Categorias de productos</h1>
+        <vex-breadcrumbs [crumbs]="['Categorias']"></vex-breadcrumbs>
+      </div>
+      <div>
+        <button mat-raised-button type="button" (click)="newCategoria()" fxHide fxShow.gt-xs>
+          <mat-icon [icIcon]="icAdd"></mat-icon> Nuevo
+        </button>
+        <button mat-icon-button type="button" (click)="newCategoria()" fxShow fxHide.gt-xs>
+          <mat-icon [icIcon]="icAdd"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </vex-page-layout-header>
+
+  <vex-page-layout-content class="-mt-6 px-gutter">
+
+    <div class="card overflow-auto -mt-16">
+      <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+
+        <div class="bg-card rounded-full border px-4" fxFlex="400px" fxFlex.lt-md="auto" fxHide.xs fxLayout="row"
+          fxLayoutAlign="start center">
+          <input matInput #nombreERef [matAutocomplete]="auto" [formControl]="categoria" placeholder="Buscar nombre"
+            class="px-4 py-3 border-0 outline-none w-full bg-transparent">
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displaySearchCategoria"
+            (optionSelected)='index(true)'>
+            <mat-option *ngIf="isLoadingSearch" (keyup.enter)="index(true);">
+              <mat-spinner diameter="50"></mat-spinner>
+            </mat-option>
+            <ng-container *ngIf="!isLoadingSearch">
+              <mat-option *ngFor="let state of searchResult.data" [value]="state">
+                <span class="body-1">{{ state.nombre }}</span>
+              </mat-option>
+              <div fxLayout="row" fxLayoutAlign="end center">
+                <p class="p-2">Mostrando {{searchResult.to}} de {{searchResult.total}} resultados.</p>
+              </div>
+            </ng-container>
+          </mat-autocomplete>
+          <button *ngIf="!categoria.value" mat-icon-button matSuffix type="button">
+            <mat-icon [icIcon]="icSearch" size="20px"></mat-icon>
+          </button>
+          <button *ngIf="categoria.value" (click)="categoria.setValue(''); index(true);" mat-icon-button matSuffix
+            type="button">
+            <mat-icon [icIcon]="icClose" size="20px"></mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="loading-container">
+        <div class="loading-shade" *ngIf="loadCategoria">
+          <mat-spinner></mat-spinner>
+        </div>
+        <table mat-table #table [dataSource]="dsCategoria" #sortCategoria="matSort" matSort matSortActive="nombre"
+          matSortDisableClear matSortDirection="asc" class="w-full">
+
+          <ng-container matColumnDef="codigo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>CÓDIGO</th>
+            <td mat-cel *matCellDef="let element"> {{element.codigo}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>DESCRIPCIÓN</th>
+            <td mat-cel *matCellDef="let element"> {{element.nombre}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>
+              ACCIONES
+            </th>
+            <td mat-cell *matCellDef="let item">
+              <div fxLayout="row" fxLayoutAlign="center center">
+                <button type="button" mat-icon-button (click)="$event.stopPropagation(); deleteCategoria(item);"
+                  class="w-8 h-8 leading-none flex items-center justify-center hover:bg-hover">
+                  <mat-icon [icIcon]="icDelete" size="18px"></mat-icon>
+                </button>
+                <button type="button" mat-icon-button
+                  (click)="$event.stopPropagation(); editCategoria(item.idcategoria);" matTooltip="Editar"
+                  class="w-8 h-8 leading-none flex items-center justify-center ml-1 hover:bg-hover">
+                  <mat-icon [icIcon]="icEdit" size="18px"></mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="empty">
+            <mat-footer-cell *matFooterCellDef>
+              No hay registros.
+            </mat-footer-cell>
+          </ng-container>
+
+          <tr *matHeaderRowDef="dcCategoria" mat-header-row></tr>
+          <tr *matRowDef="let row; columns: dcCategoria;" (click)="showCategoria(row)"
+            class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+          <tr mat-footer-row *matFooterRowDef="['empty']" [ngClass]="{'hide': rLengthCategoria > 0 || loadCategoria}">
+          </tr>
+        </table>
+        <mat-paginator #pagCategoria [length]="rLengthCategoria" [pageSizeOptions]="pSizeOptCategoria"
+          [pageSize]="pSizeCategoria">
+        </mat-paginator>
+      </div>
+    </div>
+
+  </vex-page-layout-content>
+
+</vex-page-layout>

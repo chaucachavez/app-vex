@@ -1,0 +1,53 @@
+.sede-show-dialog {
+    @screen sm {
+        width: 100%;
+    }
+
+    @screen md {
+        width: 680px;
+    }
+
+    .mat-dialog-container {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .mat-dialog-content {
+        padding: 0px 16px;
+        margin: 0px;
+    }
+
+    .mat-dialog-actions {
+        padding: 16px 24px;
+        margin: 0px;
+    }
+
+    table {
+        width: 100%;
+
+        td {
+            padding: 4px;
+        }
+    }
+
+    fieldset {
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        line-height: 24px;
+        padding: 8px;
+
+        legend {
+            padding: 0px 8px 0px 8px;
+            font-weight: 500;
+        }
+    }
+
+    .b-b-1 {
+        border-bottom: #cccccc 1px solid;
+    }
+
+    .b-t-1 {
+        border-top: #cccccc 1px solid;
+        padding: 4px 0px;
+    }
+}

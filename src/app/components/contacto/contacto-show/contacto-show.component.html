@@ -1,0 +1,62 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<div *ngIf="!loading">
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">{{entidad.entidad}}</h2>
+      <button class="text-secondary" mat-icon-button type="button" (click)="matDialogRef.close('delete')"
+        matTooltip="Eliminar">
+        <mat-icon [icIcon]="icDelete"></mat-icon>
+      </button>
+      <button class="text-secondary" mat-icon-button type="button" (click)="matDialogRef.close('edit')"
+        matTooltip="Editar">
+        <mat-icon [icIcon]="icEdit"></mat-icon>
+      </button>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" matTooltip="Cerrar">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+    <fieldset>
+      <legend>Cliente</legend>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="15">Documento</div>
+        <div fxFlex="35">{{entidad.documento?.abreviatura}}</div>
+        <div fxFlex="15">Número</div>
+        <div fxFlex="35">{{entidad.numerodoc}}</div>
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start"
+        *ngIf="[1,3,4,5,6,7].indexOf(entidad.iddocumento) !== -1">
+        <div fxFlex="15">Apellidos</div>
+        <div fxFlex="35">{{entidad.apellidopat}}</div>
+        <div fxFlex="15">Nombres</div>
+        <div fxFlex="35">{{entidad.nombre}}</div>
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start" *ngIf="entidad.iddocumento === 2">
+        <div fxFlex="15">Razón social</div>
+        <div fxFlex="80">{{entidad.entidad}}</div>
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="15">Dirección</div>
+        <div fxFlex="80">{{entidad.direccion}}</div>
+      </div>
+    </fieldset>
+    <fieldset class="mt-4">
+      <legend>Contacto</legend>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="15">Teléfono / celular</div>
+        <div fxFlex="35">{{entidad.telefono}}</div>
+        <div fxFlex="15">Correo</div>
+        <div fxFlex="35">{{entidad.email}}</div>
+      </div>
+    </fieldset>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close aria-label="CERRAR">
+      CERRAR
+    </button>
+  </mat-dialog-actions>
+</div>

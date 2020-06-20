@@ -1,0 +1,45 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<form [formGroup]="empresaForm" (ngSubmit)="save()" *ngIf="!loading">
+
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">{{dialogTitle}}</h2>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <mat-form-field appearance="fill" fxFlex="auto" hintLabel="Máximo 12 caracteres">
+        <mat-label>Ruc</mat-label>
+        <input matInput formControlName="ruc" maxlength="12" #ruc required>
+        <mat-hint align="end">{{ruc.value?.length || 0}}/12</mat-hint>
+        <mat-error *ngIf="empresaForm.get('ruc').hasError('required')">
+          Es requerido
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <mat-form-field appearance="fill" fxFlex="auto" hintLabel="Máximo 50 caracteres">
+        <mat-label>Descripción</mat-label>
+        <input matInput formControlName="nombre" maxlength="50" #nombre required>
+        <mat-hint align="end">{{nombre.value?.length || 0}}/50</mat-hint>
+        <mat-error *ngIf="empresaForm.get('nombre').hasError('required')">
+          Es requerido
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button mat-raised-button type="submit" color="primary"
+      [disabled]="empresaForm.invalid || submitted">GUARDAR</button>
+  </mat-dialog-actions>
+</form>

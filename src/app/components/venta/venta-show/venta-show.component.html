@@ -1,0 +1,278 @@
+<vex-loading *ngIf="loading"></vex-loading>
+<vex-loading *ngIf="submitted"></vex-loading>
+<!-- <pre>{{venta | json}}</pre> -->
+<div *ngIf="!loading">
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+
+      <h2 class="headline m-0" fxFlex="auto" [ngSwitch]="venta.iddocumentofiscal">
+        <span *ngSwitchCase="1">
+          Factura Electrónica {{venta.serie}} - {{venta.numero}}
+        </span>
+        <span *ngSwitchCase="2">
+          Boleta de Venta Electrónica {{venta.serie}} - {{venta.numero}}
+        </span>
+        <span *ngSwitchCase="10">
+          Nota de Débito Electrónica {{venta.serie}} - {{venta.numero}}
+        </span>
+        <span *ngSwitchCase="13">
+          Nota de Crédito Electrónica {{venta.serie}} - {{venta.numero}}
+        </span>
+      </h2>
+      <mat-divider></mat-divider>
+
+      <button mat-icon-button type="button" (click)="estadoAnulacion(venta.idventa)" class="text-secondary"
+        matTooltip="Consultar anulación" *ngIf="botones.canu">
+        <mat-icon [icIcon]="icAutorenew"></mat-icon>
+      </button>
+
+      <button mat-icon-button type="button" (click)="matDialogRef.close('regenerar')" class="text-secondary"
+        matTooltip="Regenerar PDF" *ngIf="botones.rpdf">
+        <mat-icon [icIcon]="icAutorenew"></mat-icon>
+      </button>
+
+      <button mat-icon-button type="button" (click)="printPdf(venta.pdf);" class="text-secondary" matTooltip="Imprimir">
+        <mat-icon [icIcon]="icPrint"></mat-icon>
+      </button>
+
+      <a mat-icon-button [href]="venta.pdf" target="_blank" class="text-secondary" matTooltip="Nueva pestaña"
+        *ngIf="botones.nvent">
+        <mat-icon [icIcon]="icCallMade"></mat-icon>
+      </a>
+
+      <button class="text-secondary" mat-icon-button type="button" (click)="downloadFile(venta.pdf);"
+        matTooltip="Descargar PDF">
+        <mat-icon [icIcon]="icCloudDownload"></mat-icon>
+      </button>
+
+      <button class="text-secondary" mat-icon-button type="button" (click)="matDialogRef.close('correo')"
+        matTooltip="Enviar correo" *ngIf="botones.mail">
+        <mat-icon [icIcon]="icMail"></mat-icon>
+      </button>
+
+      <button class="text-secondary" type="button" mat-icon-button (click)="matDialogRef.close('edit')"
+        matTooltip="Editar" *ngIf="botones.edit">
+        <mat-icon [icIcon]="icEdit"></mat-icon>
+      </button>
+
+      <button [matMenuTriggerFor]="settingsMenu" class="text-secondary" mat-icon-button type="button"
+        matTooltip="Más acciones">
+        <mat-icon [icIcon]="icMoreVert"></mat-icon>
+      </button>
+
+      <button mat-icon-button type="button" mat-dialog-close class="text-secondary" matTooltip="Cerrar">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <mat-tab-group fxFlex="auto" #tabGroup (selectedTabChange)="handleTabChange($event)"
+      [selectedIndex]="activeTabIndex" [color]="'accent'" [backgroundColor]="'primary'">
+      <mat-tab label="VENTA"></mat-tab>
+      <mat-tab label="COMPROBANTE" class="p-0 m-0"></mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+    <div *ngIf="activeTabIndex === 0">
+      <fieldset>
+        <legend>Archivos electrónicos</legend>
+
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+          <div fxFlex="70">
+            <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start" fxLayoutGap="6px">
+              <button mat-raised-button type="button" (click)="downloadFile(venta.pdf);" color="primary"
+                class="rounded-full" *ngIf="venta.pdf">
+                <ic-icon [icon]="icCloudDownload" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true"
+                  size="24px">
+                </ic-icon>
+                <span>Descargar PDF</span>
+              </button>
+
+              <button mat-raised-button type="button" (click)="downloadFile(venta.xml);" color="accent"
+                class="rounded-full" *ngIf="venta.xml">
+                <ic-icon [icon]="icCloudDownload" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true"
+                  size="24px">
+                </ic-icon>
+                <span>Descargar XML</span>
+              </button>
+
+              <button mat-raised-button type="button" (click)="downloadFile(venta.cdr);" color="accent"
+                class="rounded-full" *ngIf="venta.cdr">
+                <ic-icon [icon]="icCloudDownload" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true"
+                  size="24px">
+                </ic-icon>
+                <span>Descargar CDR</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <fieldset class="mt-4" fxFlex="50" [ngSwitch]="venta.iddocumentofiscal">
+
+          <legend *ngSwitchCase="1">
+            Factura Electrónica
+          </legend>
+          <legend *ngSwitchCase="2">
+            Boleta de Venta Electrónica
+          </legend>
+          <legend *ngSwitchCase="10">
+            Nota de Débito Electrónica
+          </legend>
+          <legend *ngSwitchCase="13">
+            Nota de Crédito Electrónica
+          </legend>
+
+          <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+            <div fxFlex="20">Número</div>
+            <div fxFlex="30">{{venta.serie}} - {{venta.numero}}</div>
+            <div fxFlex="20">Moneda</div>
+            <div fxFlex="30">{{venta.moneda}}</div>
+          </div>
+
+          <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+            <div fxFlex="20">F.Emisión</div>
+            <div fxFlex="30">{{venta.fechaemision | date:'dd/MM/yyyy'}}</div>
+            <div fxFlex="20">F.Venci.</div>
+            <div fxFlex="30">{{venta.fechavencimiento | date:'dd/MM/yyyy'}}</div>
+          </div>
+
+          <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+            <div fxFlex="20">Estado</div>
+            <div fxFlex="30" [ngSwitch]="venta.idestadodocumento">
+              <span *ngSwitchCase="26">Borrador</span>
+              <span *ngSwitchCase="27">Emitido</span>
+              <span *ngSwitchCase="28">Anulado</span>
+            </div>
+            <div fxFlex="20">Total</div>
+            <div fxFlex="30" [ngSwitch]="venta.moneda">
+              <span *ngSwitchCase="'PEN'">
+                S/
+              </span>
+              <span *ngSwitchCase="'USD'">
+                $
+              </span>
+              <span *ngSwitchCase="'EUR'">
+                €
+              </span>
+              {{venta.total}}
+            </div>
+          </div>
+          <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+            <div fxFlex="20">Emisión ({{venta.sunat_aceptado}})</div>
+            <div fxFlex="30" [ngSwitch]="venta.sunat_aceptado">
+              <span *ngSwitchCase="1">
+                <mat-icon [icIcon]="icCheck" size="18px" color="primary"></mat-icon>
+              </span>
+              <span *ngSwitchCase="0">
+                <mat-icon [icIcon]="icAutorenew" size="18px" color="warn" (click)="estadoComprobante(venta.idventa)">
+                </mat-icon>
+              </span>
+              <span *ngSwitchDefault>
+                <mat-icon [icIcon]="icAutorenew" size="18px" color="warn" (click)="estadoComprobante(venta.idventa)">
+                </mat-icon>
+              </span>
+            </div>
+            <div fxFlex="20" *ngIf="venta.sunat_anulado_aceptado">Anulación ({{venta.sunat_anulado_aceptado}})</div>
+            <div fxFlex="30" [ngSwitch]="venta.sunat_anulado_aceptado" *ngIf="venta.sunat_anulado_aceptado">
+              <span *ngSwitchCase="1">
+                <mat-icon [icIcon]="icCheck" size="18px" color="primary"></mat-icon>
+              </span>
+              <span *ngSwitchCase="0">
+                <mat-icon [icIcon]="icAutorenew" size="18px" color="warn" (click)="estadoAnulacion(venta.idventa)">
+                </mat-icon>
+              </span>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="mt-4" fxFlex="50">
+          <legend>Cliente</legend>
+          <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+            <div fxFlex="20">Señor(es)</div>
+            <div fxFlex="80">{{venta.clientenombre}}</div>
+          </div>
+
+          <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+            <div fxFlex="20" [ngSwitch]="venta.clientedoc">
+              <span *ngSwitchCase="1">DNI</span>
+              <span *ngSwitchCase="2">RUC</span>
+              <span *ngSwitchCase="3">C.EXT.</span>
+              <span *ngSwitchCase="4">PASAP.</span>
+              <span *ngSwitchCase="5">SIN DOC.</span>
+            </div>
+            <div fxFlex="80">{{venta.clientenumerodoc}}</div>
+          </div>
+
+          <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+            <div fxFlex="20">Dirección</div>
+            <div fxFlex="80">{{venta.clientedireccion}}</div>
+          </div>
+
+          <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+            <div fxFlex="20">Correo</div>
+            <div fxFlex="80">{{venta.cpecorreo}}
+              <small *ngIf="venta.sendcorreo === '1'">(Enviado)</small>
+              <small *ngIf="!venta.sendcorreo">(Pendiente)</small>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <fieldset class="mt-4">
+        <legend>Registro</legend>
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+          <div fxFlex="15">Creado por</div>
+          <div fxFlex="35">{{venta.creacion?.name}}</div>
+          <div fxFlex="15">Fecha y hora</div>
+          <div fxFlex="35">{{venta.created_at}}</div>
+        </div>
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start" *ngIf="venta.modificacion">
+          <div fxFlex="15">Modificado por</div>
+          <div fxFlex="85">{{venta.modificacion?.name}}</div>
+          <div fxFlex="15">Fecha y hora</div>
+          <div fxFlex="35">{{venta.updated_at}}</div>
+        </div>
+      </fieldset>
+    </div>
+    <div fxLayout="column" *ngIf="activeTabIndex === 1">
+      <div *ngIf="!venta.pdf">
+        PDF no existe, porfavor comunicarse con soporte.
+      </div>
+      <object name="DocumentoPresupuesto" type="application/pdf" [data]="venta.pdf|domseguro:''" height="600"
+        width="100%" *ngIf="venta.pdf">Comunicarse
+        con proveedor de servicios electrónicos</object>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close aria-label="CERRAR">
+      CERRAR
+    </button>
+  </mat-dialog-actions>
+
+</div>
+
+
+<mat-menu #settingsMenu="matMenu" xPosition="before" yPosition="below">
+  <button mat-menu-item (click)="matDialogRef.close('anular')" *ngIf="botones.anu">
+    <mat-icon color="warn" [icIcon]="icBlock"></mat-icon>
+    Anular
+  </button>
+  <button mat-menu-item (click)="matDialogRef.close('regenerar')" *ngIf="botones.rpdf">
+    <mat-icon [icIcon]="icAutorenew"></mat-icon>
+    Regenerar PDF
+  </button>
+  <button mat-menu-item (click)="matDialogRef.close('Notadecredito')" *ngIf="botones.nc">
+    <mat-icon [icIcon]="icInsertDriveFile"></mat-icon>
+    Nota de crédito
+  </button>
+  <button mat-menu-item (click)="matDialogRef.close('Notadedebito')" *ngIf="botones.nd">
+    <mat-icon [icIcon]="icInsertDriveFile"></mat-icon>
+    Nota de débito
+  </button>
+  <button mat-menu-item *ngIf="botones.gr">
+    <mat-icon [icIcon]="icInsertDriveFile"></mat-icon>
+    Guia de remisión
+  </button>
+</mat-menu>

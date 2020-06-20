@@ -1,0 +1,36 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<div class="dialog-content-wrapper" *ngIf="!loading">
+  <div mat-dialog-title class="m-0">
+    <mat-toolbar class="primary">
+      <mat-toolbar-row fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+        <span>PDF</span>
+        <div fxLayout="row" fxLayoutAlign="end center">
+
+          <button mat-icon-button type="button" aria-label="Imprimir" matTooltip="Imprimir">
+            <mat-icon>print</mat-icon>
+          </button>
+
+          <button mat-icon-button type="button" (click)="matDialogRef.close()" matTooltip="Cerrar">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </mat-toolbar-row>
+    </mat-toolbar>
+  </div>
+
+  <div mat-dialog-content class="p-0 m-0" fusePerfectScrollbar>
+    <div fxLayout="column" fxFlex>
+      <div class="p-24">
+        <object name="DocumentoPresupuesto" type="application/pdf" [data]="url|domseguro:'http://apiclinicanet.pe/'"
+          width="100%" height="800">Esto no est&aacute; funcionando como se esperaba</object>
+      </div>
+    </div>
+  </div>
+
+  <div mat-dialog-actions class="p-16 m-0" fxLayout="row" fxLayoutAlign="end center">
+    <button mat-button (click)="matDialogRef.close()" aria-label="CERRAR" color="accent">
+      CERRAR
+    </button>
+  </div>
+</div>

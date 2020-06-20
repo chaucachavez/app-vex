@@ -1,0 +1,143 @@
+<vex-page-layout>
+  <vex-page-layout-header class="pb-16" fxLayout="column" fxLayoutAlign="center start">
+    <div class="w-full flex flex-col sm:flex-row justify-between px-gutter">
+      <div>
+        <h1 class="title mt-0 mb-1">Locales</h1>
+        <vex-breadcrumbs [crumbs]="['Configuración', 'Locales']"></vex-breadcrumbs>
+      </div>
+      <div>
+        <button mat-raised-button type="button" (click)="newSede()" fxHide fxShow.gt-xs>
+          <mat-icon [icIcon]="icAdd"></mat-icon> Nuevo
+        </button>
+        <button mat-icon-button type="button" (click)="newSede()" fxShow fxHide.gt-xs>
+          <mat-icon [icIcon]="icAdd"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </vex-page-layout-header>
+
+  <vex-page-layout-content class="-mt-6 px-gutter">
+
+    <div class="card overflow-auto -mt-16">
+      <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+
+        <div class="bg-card rounded-full border px-4" fxFlex="400px" fxFlex.lt-md="auto" fxHide.xs fxLayout="row"
+          fxLayoutAlign="start center">
+          <input matInput #nombreERef [matAutocomplete]="auto" [formControl]="sede" placeholder="Buscar nombre"
+            class="px-4 py-3 border-0 outline-none w-full bg-transparent">
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displaySearchSede"
+            (optionSelected)='index(true)'>
+            <mat-option *ngIf="isLoadingSearch" (keyup.enter)="index(true);">
+              <mat-spinner diameter="50"></mat-spinner>
+            </mat-option>
+            <ng-container *ngIf="!isLoadingSearch">
+              <mat-option *ngFor="let state of searchResult.data" [value]="state">
+                <span class="body-1">{{ state.nombre }}</span>
+              </mat-option>
+              <div fxLayout="row" fxLayoutAlign="end center">
+                <p class="p-2">Mostrando {{searchResult.to}} de {{searchResult.total}} resultados.</p>
+              </div>
+            </ng-container>
+          </mat-autocomplete>
+          <button *ngIf="!sede.value" mat-icon-button matSuffix type="button">
+            <mat-icon [icIcon]="icSearch" size="20px"></mat-icon>
+          </button>
+          <button *ngIf="sede.value" (click)="sede.setValue(''); index(true);" mat-icon-button matSuffix type="button">
+            <mat-icon [icIcon]="icClose" size="20px"></mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="loading-container">
+        <div class="loading-shade" *ngIf="loadSede">
+          <mat-spinner></mat-spinner>
+        </div>
+        <table mat-table #table [dataSource]="dsSede" #sortSede="matSort" matSort matSortActive="nombre"
+          matSortDisableClear matSortDirection="asc" class="w-full">
+
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>NOMBRE</th>
+            <td *matCellDef="let element">
+              <div fxLayout="row" fxLayoutAlign="start center">
+                <div fxLayout="column" fxLayoutAlign="center start">
+                  <a href="javascript:;" (click)="showSede(element);" class="link">
+                    <strong>{{element.nombre}}</strong>
+                  </a>
+                  <div fxLayout="row" fxLayoutAlign="start center">
+                    <span>Sunat</span>
+                    <span class="ml-4">{{element.codigosunat}}</span>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="direccion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>DIRECCIÓN</th>
+            <td *matCellDef="let element"> {{element.direccion}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="comprobantes">
+            <th mat-header-cell *matHeaderCellDef>
+              COMPROBANTES Y SERIES
+            </th>
+            <td *matCellDef="let element">
+              <table>
+                <tr *ngFor="let item of element.comprobantes">
+                  <td style="width: 160px;">{{item.documentofiscal.nombre}}</td>
+                  <td style="width: 56px;">{{item.serie}}</td>
+                  <td style="width: 56px;">{{item.numero}}</td>
+                </tr>
+              </table>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="pdffactura">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>FACTURA</th>
+            <td *matCellDef="let element"> {{element.pdffactura}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="pdfboleta">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>BOLETA</th>
+            <td *matCellDef="let element"> {{element.pdfboleta}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>
+              ACCIONES
+            </th>
+            <td *matCellDef="let item">
+
+              <div fxLayout="row" fxLayoutAlign="center center">
+                <button type="button" mat-icon-button (click)="$event.stopPropagation(); deleteSede(item);"
+                  matTooltip="Eliminar" class="w-8 h-8 leading-none flex items-center justify-center hover:bg-hover">
+                  <mat-icon [icIcon]="icDelete" size="18px"></mat-icon>
+                </button>
+                <button type="button" mat-icon-button (click)="$event.stopPropagation(); editSede(item.idsede);"
+                  matTooltip="Editar" class="w-8 h-8 leading-none flex items-center justify-center ml-1 hover:bg-hover">
+                  <mat-icon [icIcon]="icEdit" size="18px"></mat-icon>
+                </button>
+              </div>
+
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="empty">
+            <mat-footer-cell *matFooterCellDef>
+              No hay registros.
+            </mat-footer-cell>
+          </ng-container>
+
+          <tr *matHeaderRowDef="dcSede" mat-header-row></tr>
+          <tr *matRowDef="let row; columns: dcSede;" (click)="showSede(row)"
+            class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+          <tr mat-footer-row *matFooterRowDef="['empty']" [ngClass]="{'hide': rLengthSede > 0 || loadSede}"></tr>
+        </table>
+        <mat-paginator #pagSede [length]="rLengthSede" [pageSizeOptions]="pSizeOptSede" [pageSize]="pSizeSede">
+        </mat-paginator>
+      </div>
+    </div>
+
+  </vex-page-layout-content>
+
+</vex-page-layout>

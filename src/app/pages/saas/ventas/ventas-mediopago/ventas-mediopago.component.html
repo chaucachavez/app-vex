@@ -1,0 +1,125 @@
+<form [formGroup]="mediopagoForm" (ngSubmit)="save()">
+
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">Medio de pago</h2>
+    <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+
+    <div fxLayout="row" fxLayout.lt-sm="column">
+      <div fxFlex="75" formArrayName="mediopago">
+        <fieldset *ngFor="let row of mediopagoForm.get('mediopago')['controls']; index as i" [formGroupName]="i"
+          class="mt-4">
+          <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+            <mat-form-field appearance="standard" fxFlex="auto">
+              <mat-label>Tipo</mat-label>
+              <mat-select formControlName="idmediopago">
+                <mat-option *ngFor="let item of mediosdepago" [value]="item.idmediopago">
+                  {{ item.nombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="standard" fxFlex="auto">
+              <mat-label>Importe</mat-label>
+              <input matInput type="number" formControlName="importe">
+              <mat-error *ngIf="mediopagoForm.get('mediopago')['controls'][i].controls['importe'].hasError('min')">
+                Mínimo {{ mediopagoForm.get('mediopago')['controls'][i].controls['importe'].errors.min.min
+                        }} céntimos
+              </mat-error>
+              <mat-error *ngIf="mediopagoForm.get('mediopago')['controls'][i].controls['importe'].hasError('required')">
+                Es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+            <mat-form-field appearance="standard" fxFlex="auto">
+              <mat-label>Nota</mat-label>
+              <input matInput formControlName="nota">
+            </mat-form-field>
+            <div fxFlex="10" *ngIf="mediopagoForm.get('mediopago')['controls'].length > 1 && i > 0">
+              <button mat-icon-button type="button" color="warn" (click)="deleteItem(i)" matTooltip="Eliminarxyz">
+                <mat-icon [icIcon]="icDeleteSweep"></mat-icon>
+              </button>
+            </div>
+          </div>
+        </fieldset>
+
+        <button mat-mini-fab type="button" color="accent" (click)="addItem();" matTooltip="Agregar" class="mt-4">
+          <mat-icon [icIcon]="icAdd"></mat-icon>
+        </button>
+      </div>
+      <div fxFlex="25">
+        <div fxLayout="column" fxLayoutAlign="space-between center">
+          <div class="mt-4">Pago rápido</div>
+          <mat-icon [icIcon]="icArrowDownward"></mat-icon>
+          <button mat-flat-button type="button" color="accent" class="w-100"
+            (click)="pagoRapido(mediopagoForm.get('total').value)">
+            S/ {{mediopagoForm.get('total').value | number : '1.2-2'}}
+          </button>
+          <button mat-flat-button type="button" color="primary" class="w-100" (click)="pagoRapido(1)">
+            S/ 1
+          </button>
+          <button mat-flat-button type="button" color="primary" class="w-100" (click)="pagoRapido(2)">
+            S/ 2
+          </button>
+          <button mat-flat-button type="button" color="primary" class="w-100" (click)="pagoRapido(5)">
+            S/ 5
+          </button>
+          <button mat-flat-button type="button" color="primary" class="w-100" (click)="pagoRapido(10)">
+            S/ 10
+          </button>
+          <button mat-flat-button type="button" color="primary" class="w-100" (click)="pagoRapido(20)">
+            S/ 20
+          </button>
+          <button mat-flat-button type="button" color="primary" class="w-100" (click)="pagoRapido(20)">
+            S/ 50
+          </button>
+          <button mat-flat-button type="button" color="primary" class="w-100" (click)="pagoRapido(100)">
+            S/ 100
+          </button>
+          <button mat-flat-button type="button" color="primary" class="w-100" (click)="pagoRapido(200)">
+            S/ 200
+          </button>
+          <button mat-flat-button type="button" color="warn" class="w-100" (click)="pagoRapido(10)">
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <fieldset class="mt-4">
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" fxFlex="auto">
+          <mat-label>Importe TOTAL pagado</mat-label>
+          <input matInput type="number" formControlName="pagado" [readonly]="true">
+        </mat-form-field>
+
+        <mat-form-field appearance="standard" fxFlex="auto">
+          <mat-label>Importe TOTAL</mat-label>
+          <input matInput type="number" formControlName="total" [readonly]="true">
+        </mat-form-field>
+
+        <mat-form-field appearance="standard" fxFlex="auto">
+          <mat-label>Diferencia(Vuelto)</mat-label>
+          <input matInput type="number" formControlName="vuelto" [readonly]="true">
+          <mat-error *ngIf="mediopagoForm.get('vuelto').hasError('min')">
+            Mínimo {{ mediopagoForm.get('vuelto').errors.min.min}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </fieldset>
+    <!-- <pre>
+          {{mediopagoForm.value | json}}
+        </pre> -->
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button mat-raised-button type="submit" color="primary" [disabled]="mediopagoForm.invalid">EMITIR</button>
+  </mat-dialog-actions>
+</form>

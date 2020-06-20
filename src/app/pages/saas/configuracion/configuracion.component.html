@@ -1,0 +1,61 @@
+<div id="configuracion">
+  <mat-toolbar color="primary">
+    <mat-toolbar-row>
+      <span>Configuración</span>
+    </mat-toolbar-row>
+  </mat-toolbar>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <mat-card>
+      <div fxLayout="column" fxLayout.gt-xs="row">
+        <div fxFlex>
+          <mat-nav-list>
+            <h3 mat-subheader>Empresa</h3>
+            <a mat-list-item [routerLink]="'/empresa'">
+              <mat-icon mat-list-icon [icIcon]="icHome"></mat-icon>
+              <h4 mat-line>Empresa</h4>
+              <p mat-line>Ruc, razón social, dirección, logotipo.</p>
+              <mat-divider></mat-divider>
+            </a>
+            <a mat-list-item [routerLink]="'/locales'">
+              <mat-icon mat-list-icon [icIcon]="icDomain"></mat-icon>
+              <h4 mat-line>Locales y comprobantes</h4>
+              <p mat-line>Locales y formatos A4, A5 y Ticket</p>
+              <mat-divider></mat-divider>
+            </a>
+            <a mat-list-item [routerLink]="'/tipo-de-cambio'">
+              <mat-icon mat-list-icon [icIcon]="icAttachMoney"></mat-icon>
+              <h4 mat-line>Tipos de cambios</h4>
+              <p mat-line>Compra/venta Comercial y Sunat.</p>
+              <mat-divider></mat-divider>
+            </a>
+          </mat-nav-list>
+        </div>
+
+        <div fxFlex>
+          <mat-nav-list>
+            <h3 mat-subheader>Seguridad</h3>
+            <a mat-list-item [routerLink]="'/mi-cuenta'">
+              <mat-icon mat-list-icon [icIcon]="icPerson"></mat-icon>
+              <h4 mat-line>Mi cuenta</h4>
+              <p mat-line>Información personal, cambiar contraseña.</p>
+              <mat-divider></mat-divider>
+            </a>
+            <a mat-list-item [routerLink]="'/usuarios'">
+              <mat-icon mat-list-icon [icIcon]="icGroup"></mat-icon>
+              <h4 mat-line>Usuarios</h4>
+              <p mat-line>Usuarios con acceso al sistema.</p>
+              <mat-divider></mat-divider>
+            </a>
+          </mat-nav-list>
+        </div>
+
+        <div fxFlex="33">
+        </div>
+      </div> 
+      
+    </mat-card> 
+
+  </div>
+</div>

@@ -1,0 +1,332 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<form [formGroup]="categoriaForm" (ngSubmit)="save()" *ngIf="!loading" class="loading-container">
+  <div class="loading-shade" *ngIf="submitted">
+    <div fxLayout="column" style="background: #FFFFFF;" class="p-4">
+      <div fxLayout="row" fxLayoutAlign="center center">
+        <mat-spinner></mat-spinner>
+      </div>
+      <div class="text-center pt-4">
+        <countdown [config]="countdown"></countdown>
+      </div>
+    </div>
+  </div>
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">Emitir comprobante</h2>
+      <button mat-button type="button" (click)="modalGeneral();">
+        <mat-icon size="18px" [icIcon]="icSettings"></mat-icon> GENERAL
+      </button>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <fieldset fxLayout="column" fxFlex="50">
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Local</mat-label>
+            <mat-select [formControl]="sede">
+              <mat-option *ngFor="let item of sedes" [value]="item.idsede">
+                {{ item.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="sede.hasError('required')">
+              Requerido!
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Comprobante</mat-label>
+            <mat-select [formControl]="comprobante" required>
+              <mat-option *ngFor="let item of comprobantes" [value]="item">
+                <div fxLayout="row" fxLayoutAlign="space-between center">
+                  <span fxFlex="70">{{ item.documentofiscal.nombre}} </span>
+                  <span fxFlex="30">{{ item.serie }}</span>
+                </div>
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="comprobante.hasError('required')">
+              Requerido!
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </fieldset>
+      <fieldset fxLayout="column" fxFlex="50">
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+            <mat-label>Fecha emisión</mat-label>
+            <input matInput [matDatepicker]="fechaDatePicker" name="start" formControlName="fechaemision">
+            <mat-datepicker-toggle matSuffix [for]="fechaDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #fechaDatePicker></mat-datepicker>
+            <mat-error *ngIf="categoriaForm.get('fechaemision').hasError('required')">
+              Requerido!
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="50" hintLabel="Máximo 500 comprobantes">
+            <mat-label>Cantidad de comprobantes a emitir</mat-label>
+            <input matInput type="number" formControlName="cantidad" #cantidad maxlength="3" required>
+            <mat-error *ngIf="categoriaForm.get('cantidad').hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </fieldset>
+    </div>
+
+
+
+    <fieldset fxLayout="column" class="mt-4">
+      <div fxLayout="column" formArrayName="masivodet">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+          fxLayoutGap="8px" fxLayoutGap.lt-sm="0">
+          <div fxFlex="43">Producto - servicio</div>
+          <div fxFlex="12">Detalle</div>
+          <div fxFlex="7">Cantidad</div>
+          <div fxFlex="7">Impuesto</div>
+          <div fxFlex="7">P.Unit.</div>
+          <div fxFlex="7">Sub total</div>
+          <div fxFlex="7">Total</div>
+          <div fxFlex="10" fxLayout="row" fxLayoutAlign="center center">
+            <button type="button" mat-icon-button (click)="addItem()" matTooltip="Agregar linea"
+              class="w-8 h-8 leading-none flex items-center justify-center ml-1 hover:bg-hover">
+              <mat-icon [icIcon]="icAdd" size="18px"></mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+          fxLayoutGap="8px" fxLayoutGap.lt-sm="0"
+          *ngFor="let row of categoriaForm.get('masivodet')['controls']; index as i" [formGroupName]="i">
+
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="43" class="vex-flex-form-field">
+            <mat-label *ngIf="row.get('producto').value">{{row.get('producto').value.codigo}}</mat-label>
+            <input matInput [matAutocomplete]="auto" formControlName="producto" placeholder="Buscar">
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayProductoFn"
+              (optionSelected)="autocompletadoProductoSelected(row)">
+              <mat-option *ngIf="row.get('datalistloading').value" class="p-3" value="">
+                <mat-spinner diameter="25"></mat-spinner>
+              </mat-option>
+              <ng-container *ngIf="!row.get('datalistloading').value">
+                <mat-option *ngFor="let item of row.get('datalist').value" [value]="item">
+                  <div fxLayout="column" fxLayoutAlign="center start">
+                    <small>{{ item.nombre}}</small>
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <small class="text-secondary inline-block">Precio</small>
+                      <small class="text-secondary">{{ item.precio }}</small>
+                    </div>
+                  </div>
+                </mat-option>
+              </ng-container>
+            </mat-autocomplete>
+
+            <mat-icon [icIcon]="icSearch" matSuffix
+              *ngIf="!categoriaForm.get('masivodet')['controls'][i].controls['producto'].value">
+            </mat-icon>
+            <mat-icon [icIcon]="icClose" matSuffix
+              *ngIf="categoriaForm.get('masivodet')['controls'][i].controls['producto'].value"
+              (click)="categoriaForm.get('masivodet')['controls'][i].controls['producto'].setValue('');"
+              class="cursor-pointer"></mat-icon>
+            <mat-error *ngIf="categoriaForm.get('masivodet')['controls'][i].controls['producto'].hasError('required')">
+              Requerido!
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="12" class="vex-flex-form-field">
+            <input matInput formControlName="descripcion">
+          </mat-form-field>
+
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="7" class="vex-flex-form-field">
+            <input matInput type="number" formControlName="cantidad">
+            <mat-error *ngIf="categoriaForm.get('masivodet')['controls'][i].controls['cantidad'].hasError('required')">
+              Requerido
+            </mat-error>
+            <mat-error *ngIf="categoriaForm.get('masivodet')['controls'][i].controls['cantidad'].hasError('min')">
+              Mínimo {{ categoriaForm.get('masivodet')['controls'][i].controls['cantidad'].errors.min.min}}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="7" class="vex-flex-form-field">
+            <mat-select formControlName="idimpuesto">
+              <mat-option *ngFor="let item of impuestos" [value]="item.idimpuesto">
+                {{ item.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="categoriaForm.get('masivodet')['controls'][i].controls['idimpuesto'].hasError('required')">
+              Requerido!
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="7" class="vex-flex-form-field">
+            <input matInput type="number" formControlName="preciounit">
+            <mat-error
+              *ngIf="categoriaForm.get('masivodet')['controls'][i].controls['preciounit'].hasError('required')">
+              Requerido!
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="7" class="vex-flex-form-field">
+            <input matInput type="number" formControlName="valorventa">
+          </mat-form-field>
+
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="7" class="vex-flex-form-field">
+            <input matInput type="number" formControlName="total" class="text-right">
+            <mat-error *ngIf="categoriaForm.get('masivodet')['controls'][i].controls['total'].hasError('required')">
+              Requerido!
+            </mat-error>
+          </mat-form-field>
+
+          <div fxLayout="row" fxLayoutAlign="center center" fxFlex="10" #addListOriginRef>
+            <button type="button" mat-icon-button (click)="deleteItem(i)" matTooltip="Eliminar"
+              class="w-8 h-8 leading-none flex items-center justify-center hover:bg-hover">
+              <mat-icon [icIcon]="icDelete" size="18px"></mat-icon>
+            </button>
+
+            <button type="button" mat-icon-button (click)="openAddList(row, addListTemplate, addListOriginRef)"
+              matTooltip="Editar" class="w-8 h-8 leading-none flex items-center justify-center ml-1 hover:bg-hover">
+              <mat-icon [icIcon]="icEdit" size="18px"></mat-icon>
+            </button>
+
+            <ng-template #addListTemplate let-close="close">
+              <div fxLayout="column" class="card px-4 pt-3 pb-2">
+                <div fxLayout="row" fxLayoutAlign="end center">
+                  <button (click)="close()" class="text-secondary w-8 h-8 leading-none" mat-icon-button type="button">
+                    <mat-icon [icIcon]="icClose" size="18px"></mat-icon>
+                  </button>
+                </div>
+                <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                  <div fxFlex="auto" fxLayout="row" fxLayoutAlign="center start">
+                    <mat-slide-toggle formControlName="bolsa" labelPosition="after">
+                    </mat-slide-toggle>
+                  </div>
+                  <mat-form-field appearance="standard" floatLabel="always" fxFlex="80">
+                    <mat-label>Impuesto a bolsa plástica</mat-label>
+                    <input matInput type="number" formControlName="impuestobolsa">
+                  </mat-form-field>
+                </div>
+                <mat-form-field appearance="standard" floatLabel="always">
+                  <mat-label>Descuento (Aplica al Sub total)</mat-label>
+                  <input matInput type="number" formControlName="descuento">
+                </mat-form-field>
+                <mat-form-field appearance="standard" floatLabel="always">
+                  <mat-label>IGV de ítem</mat-label>
+                  <input matInput type="number" formControlName="montototalimpuestos">
+                </mat-form-field>
+              </div>
+            </ng-template>
+          </div>
+
+        </div>
+
+        <div fxLayout="row" fxLayoutAlign="center center" *ngIf="categoriaForm.get('masivodet').hasError('required')"
+          class="mt-4">
+          <button mat-stroked-button class="w-full" (click)="addItem()" matTooltip="Agregar linea">
+            <mat-icon [icIcon]="icAdd" size="18px"></mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0" class="mt-4">
+        <div fxLayout="column" fxLayoutAlign="space-between" fxFlex="50">
+
+        </div>
+        <div fxFlex="50">
+          <div fxLayout="column" fxLayout.gt-xs="row">
+            <div fxFlex="70" class="text-right">
+              Descuento global <strong>%</strong>
+            </div>
+            <div fxFlex="30" class="text-right">
+              <input matInput type="number" formControlName="descuentoporcentaje"
+                style="border-bottom: 1px solid #CCC; width: 80px;">
+            </div>
+          </div>
+          <div fxLayout="column" fxLayout.gt-xs="row" class="mt-1">
+            <div fxFlex="70" class="text-right">
+              Otros cargos S/
+            </div>
+            <div fxFlex="30" class="text-right">
+              <input matInput type="number" formControlName="cargo" style="border-bottom: 1px solid #CCC; width: 80px;">
+            </div>
+          </div>
+          <div fxLayout="column" fxLayout.gt-xs="row" *ngIf="categoriaForm.get('descuentototal').value > 0">
+            <div fxFlex="70" class="text-right">
+              Descuento total (-) S/
+            </div>
+            <div fxFlex="30" class="text-right">
+              {{categoriaForm.get('descuentototal').value | number : '1.2-2'}}
+            </div>
+          </div>
+          <div fxLayout="column" fxLayout.gt-xs="row" *ngIf="this.leyenda.exonerada">
+            <div fxFlex="70" class="text-right">
+              Exonerada S/
+            </div>
+            <div fxFlex="30" class="text-right">
+              {{categoriaForm.get('exonerada').value | number : '1.2-2'}}
+            </div>
+          </div>
+          <div fxLayout="column" fxLayout.gt-xs="row" *ngIf="this.leyenda.inafecta">
+            <div fxFlex="70" class="text-right">
+              Inafecta S/
+            </div>
+            <div fxFlex="30" class="text-right">
+              {{categoriaForm.get('inafecta').value | number : '1.2-2'}}
+            </div>
+          </div>
+          <div fxLayout="column" fxLayout.gt-xs="row" *ngIf="this.leyenda.gratuita">
+            <div fxFlex="70" class="text-right">
+              Gratuita S/
+            </div>
+            <div fxFlex="30" class="text-right">
+              {{categoriaForm.get('gratuita').value | number : '1.2-2'}}
+            </div>
+          </div>
+          <div fxLayout="column" fxLayout.gt-xs="row">
+            <div fxFlex="70" class="text-right">
+              Gravada S/
+            </div>
+            <div fxFlex="30" class="text-right">
+              {{categoriaForm.get('gravada').value | number : '1.2-2'}}
+            </div>
+          </div>
+          <div fxLayout="column" fxLayout.gt-xs="row">
+            <div fxFlex="70" class="text-right">
+              IGV S/
+            </div>
+            <div fxFlex="30" class="text-right">
+              {{categoriaForm.get('valorimpuesto').value | number : '1.2-2'}}
+            </div>
+          </div>
+          <div fxLayout="column" fxLayout.gt-xs="row" *ngIf="this.leyenda.icpber">
+            <div fxFlex="70" class="text-right">
+              ICBPER
+            </div>
+            <div fxFlex="30" class="text-right">
+              {{categoriaForm.get('totalimpuestobolsa').value | number : '1.2-2'}}
+            </div>
+          </div>
+          <div fxLayout="column" fxLayout.gt-xs="row">
+            <div fxFlex="70" class="text-right font-weight-600">
+              <strong>Total S/</strong>
+            </div>
+            <div fxFlex="30" class="text-right">
+              <strong>{{categoriaForm.get('total').value | number : '1.2-2'}}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+    <!-- <pre>{{comprobante.value | json}}</pre> -->
+    <!-- <pre>{{categoriaForm.value | json}}</pre> -->
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button mat-raised-button type="submit" color="primary"
+      [disabled]="categoriaForm.invalid || submitted">EMITIR</button>
+  </mat-dialog-actions>
+</form>

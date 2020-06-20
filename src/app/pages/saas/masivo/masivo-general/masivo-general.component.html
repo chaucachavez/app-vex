@@ -1,0 +1,143 @@
+<form [formGroup]="generalForm" (ngSubmit)="save()">
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">Datos generales</h2>
+    <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+
+      <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+        <mat-label>Fecha vencimiento</mat-label>
+        <input matInput [matDatepicker]="fechaDatePickerVence" name="start" formControlName="fechavencimiento">
+        <mat-datepicker-toggle matSuffix [for]="fechaDatePickerVence"></mat-datepicker-toggle>
+        <mat-datepicker #fechaDatePickerVence></mat-datepicker>
+      </mat-form-field>
+      <div fxLayout="row" fxLayoutGap="8px" fxFlex="50">
+        <mat-form-field appearance="standard" floatLabel="always" class="vex-flex-form-field" fxFlex="auto">
+          <mat-label>Moneda</mat-label>
+          <mat-select formControlName="moneda">
+            <mat-option *ngFor="let item of monedas" [value]="item.moneda">
+              {{ item.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="generalForm.get('moneda').hasError('required')">
+            Requerido!
+          </mat-error>
+        </mat-form-field>
+        <div fxFlex="60">
+          <mat-form-field appearance="standard" floatLabel="always" class="vex-flex-form-field" fxFlex="auto">
+            <mat-label>Tipo de cambio</mat-label>
+            <input matInput type="number" formControlName="tipocambio">
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <mat-form-field appearance="standard" floatLabel="always" class="vex-flex-form-field" fxFlex="auto">
+        <mat-label [ngSwitch]="generalForm.get('clientedoc').value">
+          <span *ngSwitchCase="1">DNI</span>
+          <span *ngSwitchCase="2">RUC</span>
+          <span *ngSwitchCase="3">C.Extranjeria</span>
+          <span *ngSwitchCase="4">Pasaporte</span>
+          <span *ngSwitchCase="5">Sin Documento</span>
+          <span *ngSwitchDefault>Cliente</span>
+          <i class="ml-1">{{generalForm.get('clientenumerodoc').value}}</i>
+        </mat-label>
+
+        <input matInput [matAutocomplete]="autoCliente" [formControl]="cliente">
+        <mat-autocomplete autoActiveFirstOption #autoCliente="matAutocomplete" [displayWith]="displaySearchEntidad"
+          (optionSelected)="autocompletadoClienteSelected($event.option.value)">
+          <mat-option *ngIf="isLoadingSearch" class="p-3" value="">
+            <mat-spinner diameter="25"></mat-spinner>
+          </mat-option>
+          <ng-container *ngIf="!isLoadingSearch">
+            <mat-option *ngFor="let state of searchResult.data" [value]="state" [ngSwitch]="state.iddocumento">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                <div fxLayout="column" fxLayoutAlign="center start">
+                  <ic-icon [icIcon]="icAccountCircle" size="24px"
+                    *ngIf="[1,3,4,5,6,7].indexOf(state.iddocumento) !== -1">
+                  </ic-icon>
+                  <ic-icon [icIcon]="icDomain" size="24px" *ngIf="state.iddocumento === 2"></ic-icon>
+                </div>
+                <div fxLayout="column" fxLayoutAlign="center stretch">
+                  <small>{{ state.entidad }}</small>
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                    <small class="text-secondary inline-block" *ngSwitchCase="1">DNI</small>
+                    <small class="text-secondary inline-block" *ngSwitchCase="2">RUC</small>
+                    <small class="text-secondary inline-block" *ngSwitchCase="3">C.Ext.</small>
+                    <small class="text-secondary inline-block" *ngSwitchCase="4">Pasap.</small>
+                    <small class="text-secondary inline-block" *ngSwitchCase="5">Sin D.</small>
+                    <small class="text-secondary inline-block" *ngSwitchDefault>Identificación</small>
+                    <small class="text-secondary">{{ state.numerodoc }}</small>
+                  </div>
+                </div>
+              </div>
+            </mat-option>
+            <div fxLayout="row">
+              <small class="p-3">Mostrando {{searchResult.to}} de {{searchResult.total}} resultados.</small>
+            </div>
+          </ng-container>
+        </mat-autocomplete>
+        <mat-icon [icIcon]="icSearch" matSuffix *ngIf="!cliente.value"></mat-icon>
+        <mat-icon [icIcon]="icClose" matSuffix *ngIf="cliente.value" (click)="cliente.setValue('');"
+          class="cursor-pointer"></mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+        <mat-label>Tipo de operación</mat-label>
+        <mat-select formControlName="operacion" required>
+          <mat-option *ngFor="let item of operaciones" [value]="item.operacion">
+            {{ item.nombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+        <mat-label>Formato impresión</mat-label>
+        <mat-select formControlName="pdfformato" required>
+          <mat-option *ngFor="let item of formatos" [value]="item.id">
+            {{ item.nombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+      <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+        <mat-label>Condiciones de pago</mat-label>
+        <input matInput formControlName="condicionpago">
+      </mat-form-field>
+      <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+        <mat-label>Observaciones</mat-label>
+        <input matInput formControlName="observacion">
+      </mat-form-field>
+    </div>
+    <!-- <pre>{{cliente.value | json}}</pre> -->
+    <fieldset>
+      <div fxLayout="column">
+        <mat-slide-toggle formControlName="detraccion"> Comprobante sujeto a detracción?
+        </mat-slide-toggle>
+        <mat-slide-toggle formControlName="selvaproducto"> Bienes región selva?
+        </mat-slide-toggle>
+        <mat-slide-toggle formControlName="selvaservicio"> Servicios región selva?
+        </mat-slide-toggle>
+      </div>
+    </fieldset>
+
+  </mat-dialog-content>
+
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button color="primary" mat-raised-button type="submit" [disabled]="generalForm.invalid">ACEPTAR</button>
+  </mat-dialog-actions>
+
+</form>

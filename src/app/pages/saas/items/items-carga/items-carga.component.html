@@ -1,0 +1,32 @@
+<form [formGroup]="cargaForm" (ngSubmit)="save()">
+
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">Subir productos de forma masiva</h2>
+    <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+    <p>
+      Para agregar o editar productos, sube un archivo EXCEL con su información, como el nombre, precio de
+      venta,
+      unidad de medida y más.
+    </p>
+
+    <!-- <ejs-uploader [autoUpload]='false' [multiple]='false' allowedExtensions='.xls, .xlsx'
+          [asyncSettings]='path' (success)="onUploadSuccess($event)" (uploading)="addHeaders($event)"
+          (failure)="onUploadFailure($event)" [buttons]='buttons'></ejs-uploader> -->
+
+    <p class="mt-32"><strong>¿No estás seguro de cómo comenzar?</strong></p>
+
+    <p>Descarga un archivo EXCEL y, luego, edítalo y súbelo.
+    </p>
+
+    <ul>
+      <li>Descarga la <a href="javascript:;" (click)="descargaTemplate()">plantilla EXCEL</a> en blanco</li>
+    </ul>
+  </mat-dialog-content>
+</form>

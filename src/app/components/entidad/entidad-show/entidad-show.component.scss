@@ -1,0 +1,39 @@
+.entidad-show-dialog {
+     
+    .mat-dialog-container {
+        padding: 0;
+    }
+    .dialog-content-wrapper {
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+    } 
+    .mat-table {
+        width: 100%; 
+        border: 0px;
+    }
+    .mat-cell {
+        font-size: 12px;
+    }
+    .hide {
+        display: none;
+    }
+    fieldset {
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        line-height: 24px;
+        legend {
+            padding: 0px 8px 0px 8px;
+        }
+    }
+    .fieldset-m-0 {
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        line-height: 24px;
+        padding: 0px;
+        legend {
+            padding: 0px 8px 0px 8px;
+            margin-left: 10px;
+        }
+    }
+}

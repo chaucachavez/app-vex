@@ -1,0 +1,36 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<div *ngIf="!loading">
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">{{venta.docnegocio.nombre}} {{venta.serie}} - {{venta.numero}}</h2>
+
+    <a mat-icon-button [href]="venta.pdf" target="_blank" class="text-secondary" matTooltip="Nueva pestaña">
+      <mat-icon [icIcon]="icCallMade"></mat-icon>
+    </a>
+
+    <button mat-icon-button type="button" (click)="downloadPdf(venta.pdf);" class="text-secondary"
+      matTooltip="Descargar">
+      <mat-icon [icIcon]="icCloudDownload"></mat-icon>
+    </button>
+
+    <button mat-icon-button type="button" (click)="printPdf(venta.pdf);" class="text-secondary" matTooltip="Imprimir">
+      <mat-icon [icIcon]="icPrint"></mat-icon>
+    </button>
+
+    <button mat-icon-button type="button" mat-dialog-close class="text-secondary" matTooltip="Cerrar">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+    <object name="DocumentoPresupuesto" type="application/pdf" [data]="venta.pdf|domseguro:''" height="800">Comunicarse
+      con proveedor de servicios electrónicos</object>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+  </mat-dialog-actions>
+
+</div>

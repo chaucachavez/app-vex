@@ -1,0 +1,91 @@
+<form id="cuenta-form" [formGroup]="usuarioForm" (ngSubmit)="save()">
+
+  <mat-toolbar color="primary">
+    <mat-toolbar-row fxLayoutAlign="space-between center">
+      <div fxLayout="row" fxLayoutAlign="center center">
+        <button mat-icon-button type="button" [routerLink]="'/configuracion'">
+          <mat-icon [icIcon]="icArrowBack"></mat-icon>
+        </button>
+        <span>Mi cuentax</span>
+      </div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <mat-card>
+      <mat-card-content>
+        <!-- <div fxLayout="column" fxLayout.gt-xs="row"> -->
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <div fxLayout="column" fxFlex="50">
+
+            <mat-form-field appearance="standard">
+              <mat-label>Correo</mat-label>
+              <input matInput formControlName="email">
+              <mat-error *ngIf="usuarioForm.get('email').hasError('required')">
+                Es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="standard">
+              <mat-label>Contraseña</mat-label>
+              <input matInput type="password" formControlName="password" autocomplete="off">
+              <mat-error *ngIf="usuarioForm.get('password').hasError('required')">
+                Es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="standard">
+              <mat-label>Confirmar contraseña</mat-label>
+              <input matInput type="password" formControlName="passwordConfirm" autocomplete="off" autocomplete="new-password">
+              <mat-error *ngIf="usuarioForm.get('passwordConfirm').hasError('email')">
+                Ingrese correo válido
+              </mat-error>
+              <mat-error *ngIf="usuarioForm.get('passwordConfirm').hasError('passwordsNotMatching')">
+                Contraseña no coincide
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="standard">
+              <mat-label>Nombre completo</mat-label>
+              <input matInput formControlName="name">
+              <mat-error *ngIf="usuarioForm.get('name').hasError('required')">
+                Es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="standard">
+              <mat-label>Celular</mat-label>
+              <input matInput formControlName="celular">
+              <mat-error *ngIf="usuarioForm.get('celular').hasError('required')">
+                Es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div fxFlex="50">
+            <fieldset>
+              <legend>Imagen de perfil <em>(Alto:100px Ancho:100px)</em></legend>
+              <div fxLayout="column" fxLayout.gt-xs="row">
+                <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center center">
+                  <img *ngIf="!imagenTemp" [src]="usuarioForm.controls['imgperfil'].value | imagen" class="avatar huge">
+                  <img *ngIf="imagenTemp" [src]="imagenTemp" class="avatar huge">
+                </div>
+                <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center center">
+                  <input type="file" (change)="seleccionImage($event.target.files[0])">
+                </div>
+              </div>
+            </fieldset>
+            
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions fxLayout="row" fxLayoutAlign="end center">
+        <button mat-raised-button color="primary" [disabled]="!usuarioForm.valid || submitted" type="submit" class="w-full">
+          GUARDAR CAMBIOS
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+  <!-- / CONTENT -->
+
+</form>

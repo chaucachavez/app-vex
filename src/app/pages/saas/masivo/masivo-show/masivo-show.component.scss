@@ -1,0 +1,50 @@
+.masivo-show-dialog {
+    @screen sm {
+        // width: 100%;
+    }
+
+    @screen md {
+        width: 800px;
+        // width: 960px;
+    }
+
+    .mat-dialog-container {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .mat-dialog-content {
+        padding: 0px 16px;
+        margin: 0px;
+    }
+
+    .mat-dialog-actions {
+        padding: 16px 24px;
+        margin: 0px;
+    }
+
+    fieldset {
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        line-height: 24px;
+        padding: 8px;
+
+        legend {
+            padding: 0px 8px 0px 8px;
+        }
+    }
+
+    .table-hover {
+        border-collapse: collapse;
+        width: 100%;
+
+        tr:nth-child(even) {
+            background-color: #F5F5F5;
+        }
+
+        // tbody tr:hover td,
+        // tbody tr:hover th {
+        //     background-color: #F5F5F5;
+        // }
+    }
+}

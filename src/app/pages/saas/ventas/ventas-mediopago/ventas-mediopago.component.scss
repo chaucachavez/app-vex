@@ -1,0 +1,28 @@
+.ventasmediopago-form-dialog {
+
+    @screen sm {
+        width: 100%;
+    }
+    
+    @screen md {
+        width: 640px;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    fieldset {
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        padding: 8px; 
+        legend {
+            padding: 0px 8px 0px 8px;
+        }
+    }
+
+    .w-100 {
+        width: 104px;
+        margin-bottom: 4px; 
+    }
+}

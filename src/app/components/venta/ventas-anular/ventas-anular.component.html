@@ -1,0 +1,33 @@
+<vex-loading *ngIf="submitted"></vex-loading>
+
+<form [formGroup]="anularForm" (ngSubmit)="save()">
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">Anulación</h2>
+    <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+    <mat-form-field appearance="standard">
+      <mat-label>Comprobante</mat-label>
+      <input matInput formControlName="comprobante" [readonly]="true">
+    </mat-form-field>
+    <mat-form-field appearance="fill" [floatLabel]="'always'">
+      <mat-label>Motivo de anulación (Opcional)</mat-label>
+      <input matInput formControlName="motivoanulacion" #motivo>
+    </mat-form-field>
+    <!-- <pre>
+        {{anularForm.value | json}} 
+      </pre> -->
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button color="primary" mat-raised-button type="submit" [disabled]="anularForm.invalid || submitted">SI,
+      ANULAR</button>
+  </mat-dialog-actions>
+
+</form>

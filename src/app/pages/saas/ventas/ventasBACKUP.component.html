@@ -1,0 +1,351 @@
+<div id="ventas-list">
+
+  <!-- TOP BACKGROUND -->
+  <div class="top-bg accent"></div>
+  <!-- / TOP BACKGROUND -->
+
+  <!-- CENTER -->
+  <div class="center">
+
+    <!-- HEADER -->
+    <div class="header accent" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-sm="row"
+      fxLayoutAlign.gt-sm="space-between center">
+
+      <!-- APP TITLE -->
+      <div class="logo mb-24 mb-md-0" fxLayout="row" fxLayoutAlign="start center">
+        <span class="logo-text h1" [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
+          Comprobantes
+        </span>
+      </div>
+      <!-- / APP TITLE -->
+
+      <!-- SEARCH -->
+      <form [formGroup]="searchForm" (ngSubmit)="index()" *ngIf="!filtros">
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <mat-form-field style="width: 150px;">
+            <mat-select placeholder="Comprobante" name="iddocumentofiscal" formControlName="iddocumentofiscal">
+              <mat-option [value]="null">Todos</mat-option>
+              <mat-option
+                *ngFor="let row of [{nombre: 'Factura', value: 1}, {nombre: 'Boleta de venta', value: 2}, {nombre: 'Nota de crédito', value:13}, {nombre: 'Nota de débito', value: 10}]"
+                [value]="row.value">
+                {{ row.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field style="width: 80px;">
+            <input matInput placeholder="Serie" name="serie" formControlName="serie">
+          </mat-form-field>
+          <mat-form-field style="width: 80px;">
+            <input matInput placeholder="Número" name="numero" formControlName="numero">
+          </mat-form-field>
+          <button mat-icon-button type="submit" matTooltip="Buscar">
+            <mat-icon>search</mat-icon>
+          </button>
+        </div>
+      </form>
+      <!-- / SEARCH -->
+
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <!-- BUTTONS -->
+        <button mat-raised-button [matMenuTriggerFor]="menuAdd" class="mr-sm-8" fxHide fxShow.gt-xs>
+          <mat-icon>add</mat-icon> Nuevo
+        </button>
+        <button mat-icon-button type="button" fxShow fxHide.gt-xs [matMenuTriggerFor]="menuAdd">
+          <mat-icon>add</mat-icon>
+        </button>
+        <mat-menu #menuAdd="matMenu">
+          <button mat-menu-item [routerLink]="'/ventas/nuevo'">
+            <mat-icon>file_copy</mat-icon>
+            Factura
+          </button>
+          <button mat-menu-item [routerLink]="'/ventas/nuevo'">
+            <mat-icon>file_copy</mat-icon>
+            Boleta de venta
+          </button>
+          <button mat-menu-item [routerLink]="'/ventas/nuevo'">
+            <mat-icon>file_copy</mat-icon>
+            Nota de crédito
+          </button>
+          <button mat-menu-item (click)="newVenta()">
+            <mat-icon>file_copy</mat-icon>
+            Nota de débito
+          </button>
+        </mat-menu>
+        <button mat-raised-button (click)="activarFiltro()" class="mr-sm-8" fxHide fxShow.gt-xs>
+          <mat-icon>filter_list</mat-icon> Filtro
+        </button>
+        <button mat-icon-button (click)="activarFiltro()" fxShow fxHide.gt-xs>
+          <mat-icon>filter_list</mat-icon>
+        </button>
+        <button mat-raised-button matTooltip="Descargar Excel" class="mr-sm-8" fxHide fxShow.gt-xs (click)="descargar();">
+          <mat-icon>cloud_download</mat-icon>
+        </button>
+        <button mat-icon-button fxShow fxHide.gt-xs>
+          <mat-icon>cloud_download</mat-icon>
+        </button>
+        <!-- / BUTTONS -->
+
+        <!-- MORE BUTTON -->
+        <button mat-raised-button [matMenuTriggerFor]="menu" fxHide fxShow.gt-xs>
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <button mat-icon-button fxShow fxHide.gt-xs [matMenuTriggerFor]="menu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item disabled (click)="newCitamedica();">
+            <mat-icon>people</mat-icon>
+            <span>Duplicados</span>
+          </button>
+        </mat-menu>
+        <!-- / MORE BUTTON -->
+      </div>
+    </div>
+    <!-- / HEADER -->
+
+    <form [formGroup]="filterForm" (ngSubmit)="index()" *ngIf="filtros">
+      <mat-card class="mb-8">
+        <mat-card-content>
+          <div fxLayout="column" fxLayout.gt-xs="row">
+            <mat-form-field class="mr-sm-24" fxFlex="13">
+              <mat-select placeholder="Comprobante" name="iddocumentofiscal" formControlName="iddocumentofiscal">
+                <mat-option [value]="null">Todos</mat-option>
+                <mat-option
+                  *ngFor="let row of [{nombre: 'Factura', value: 1}, {nombre: 'Boleta de venta', value: 2}, {nombre: 'Nota de crédito', value:13}, {nombre: 'Nota de débito', value: 10}]"
+                  [value]="row.value">
+                  {{ row.nombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="mr-sm-24" fxFlex="6">
+              <input matInput placeholder="Serie" name="serie" formControlName="serie">
+            </mat-form-field>
+            <mat-form-field class="mr-sm-24" fxFlex="10">
+              <input matInput placeholder="Número desde" name="numeroFrom" formControlName="numeroFrom">
+            </mat-form-field>
+            <mat-form-field class="mr-sm-24" fxFlex="10">
+              <input matInput placeholder="Número hasta" name="numeroTo" formControlName="numeroTo">
+            </mat-form-field>
+            <mat-form-field class="mr-sm-24" fxFlex="35">
+              <input matInput [matAutocomplete]="auto" formControlName="idcliente" placeholder="Cliente">
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displaySearchEntidad"
+                (optionSelected)='index()'>
+                <mat-option *ngIf="isLoadingSearch" (keyup.enter)="index();">
+                  <mat-spinner diameter="50"></mat-spinner>
+                </mat-option>
+                <ng-container *ngIf="!isLoadingSearch">
+                  <mat-option *ngFor="let item of searchResult.data" [value]="item">
+                    <div fxLayout="row" fxLayoutAlign="space-between center">
+                      <div>
+                        <img class="avatar mt-8" [src]="item.imgperfil | imagen:item.sexo">
+                        <small>{{item.entidad}}</small>
+                      </div>
+                      <div>
+                        <small>{{item.documento?.abreviatura}}</small>
+                        <small class="ml-4">{{item.numerodoc}}</small>
+                      </div>
+                    </div>
+                  </mat-option>
+                  <div fxLayout="row" fxLayoutAlign="start center">
+                    <p class="ml-16">Mostrando {{searchResult.to}} de {{searchResult.total}} resultados.</p>
+                  </div>
+                </ng-container>
+              </mat-autocomplete>
+              <mat-icon matSuffix *ngIf="!filterForm.get('idcliente').value">search</mat-icon>
+              <mat-icon matSuffix *ngIf="filterForm.get('idcliente').value"
+                (click)="this.filterForm.get('idcliente').setValue('', { emitEvent: false }); index();"
+                class="cursor-pointer">close</mat-icon>
+            </mat-form-field>
+            <mat-form-field class="mr-sm-24" fxFlex="13">
+              <input matInput placeholder="F.Emisión desde" name="fechaemisionFrom" formControlName="fechaemisionFrom"
+                [matDatepicker]="fechaFromDatePicker">
+              <mat-datepicker-toggle matSuffix [for]="fechaFromDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #fechaFromDatePicker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field fxFlex="13">
+              <input matInput placeholder="F.Emisión hasta" name="fechaemisionTo" formControlName="fechaemisionTo"
+                [matDatepicker]="fechaToDatePicker">
+              <mat-datepicker-toggle matSuffix [for]="fechaToDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #fechaToDatePicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+        <mat-card-actions fxLayout="row" fxLayoutAlign="end center">
+          <button mat-button type="button" color="accent" (click)="activarFiltro()">
+            CERRAR
+          </button>
+          <button mat-flat-button color="accent" type="submit">
+            BUSCAR
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </form>
+
+    <!-- CONTENT CARD -->
+    <div class="content-card loading-container">
+
+      <!-- GRID LOADING -->
+      <div class="loading-shade" *ngIf="loadVenta">
+        <mat-spinner></mat-spinner>
+      </div>
+      <!-- / GRID LOADING -->
+
+      <mat-table class="ventas-table" #table [dataSource]="dsVenta" #sortVenta="matSort" matSort
+        matSortActive="numero" matSortDisableClear matSortDirection="desc" [@animateStagger]="{value:'50'}"
+        fusePerfectScrollbar>
+
+        <ng-container matColumnDef="cliente_entidad">
+          <mat-header-cell *matHeaderCellDef>Cliente</mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <div fxLayout="row" fxLayoutAlign="start center">
+              <a href="javascript:;" (click)="$event.stopPropagation(); showEntidad(element.cliente.identidad);">
+                <img class="avatar" [src]="element.cliente.imgperfil | imagen:element.cliente.sexo">
+              </a>
+              <div fxLayout="column" fxLayoutAlign="center start">
+                <a href="javascript:;" (click)="$event.stopPropagation(); showEntidad(element.cliente.identidad);"
+                  class="link">
+                  <strong>{{element.cliente.entidad}}</strong>
+                </a>
+                <div fxLayout="row" fxLayoutAlign="start center">
+                  <span>{{element.cliente.documento?.abreviatura}}</span>
+                  <span class="ml-4" *ngIf="element.cliente.numerodoc">{{element.cliente.numerodoc}}</span>
+                  <a href="javascript:;" *ngIf="!element.cliente.numerodoc" class="warn p-4"
+                    (click)="$event.stopPropagation(); editEntidad(element.cliente)"><small>Sin
+                      identificación</small></a>
+                </div>
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="idsede">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>SEDE</mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span>{{element.sede.sedeabrev}}</span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="iddocumentofiscal">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Comprobante</mat-header-cell>
+          <mat-cell *matCellDef="let item">
+            <span>{{item.docnegocio.nombre}}</span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="numero">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Número</mat-header-cell>
+          <mat-cell *matCellDef="let item">
+            <span>{{item.serie}} - {{item.numero}}</span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="fechaemision">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Fecha emisión</mat-header-cell>
+          <mat-cell *matCellDef="let item">
+            <span>{{item.fechaemision}}</span>
+            <!-- <span>{{element.fecha_date | date:'d MMM yy'}}</span> -->
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="idestadodocumento">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>Estado</mat-header-cell>
+          <mat-cell *matCellDef="let element" [ngSwitch]="element.idestadodocumento">
+            <span *ngSwitchCase="26">Pendiente</span>
+            <span *ngSwitchCase="27">Pagado</span>
+            <span *ngSwitchCase="28">Anulado</span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="total">
+          <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
+          <mat-cell *matCellDef="let item">
+            <span>{{item.total | currency:'PEN'}}</span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="enviado">
+          <mat-header-cell *matHeaderCellDef>Estado en Sunat</mat-header-cell>
+          <mat-cell *matCellDef="let item">
+            <mat-icon class="s-16">check</mat-icon>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="sunat">
+          <mat-header-cell *matHeaderCellDef>Enviado a cliente</mat-header-cell>
+          <mat-cell *matCellDef="let item">
+            <mat-icon class="s-16">check</mat-icon>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <mat-header-cell *matHeaderCellDef>
+            <div fxLayout="row" fxLayoutAlign="center center">Acciones</div>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <div fxLayout="row" fxLayoutAlign="center center">
+              <!-- <button type="button" mat-icon-button color="warn" (click)="anularVenta(element);" matTooltip="Anular"
+                *ngIf="[26, 27].indexOf(element.idestadodocumento) !== -1">
+                <mat-icon class="s-20">block</mat-icon>
+              </button> -->
+              <button type="button" mat-icon-button color="accent"
+                (click)="$event.stopPropagation(); pdf(element.idventa);" matTooltip="Imprimir">
+                <mat-icon class="s-20">print</mat-icon>
+              </button>
+              <button type="button" mat-icon-button color="accent"
+                (click)="$event.stopPropagation(); pdf();" matTooltip="PDF">
+                <mat-icon class="s-20">insert_drive_file</mat-icon>
+              </button> 
+              <!-- <button type="button" mat-icon-button color="accent"
+                (click)="$event.stopPropagation(); showVenta(element);" matTooltip="Ver">
+                <mat-icon class="s-20">visibility</mat-icon>
+              </button> -->
+              <button type="button" mat-icon-button color="accent"
+                (click)="$event.stopPropagation(); editVenta('edit', element);" matTooltip="Editar">
+                <mat-icon class="s-20">edit</mat-icon>
+              </button>
+              <button type="button" mat-icon-button color="accent" [matMenuTriggerFor]="menumore"
+                (click)="$event.stopPropagation();">
+                <mat-icon class="s-20">more_vert</mat-icon>
+              </button>
+              <mat-menu #menumore="matMenu">
+                <button mat-menu-item (click)="anularVenta(element);">
+                  <mat-icon class="s-20" color="warn">block</mat-icon>
+                  <span>Anular</span>
+                </button>
+                <button mat-menu-item>
+                  <mat-icon class="s-20">mail</mat-icon>
+                  <span>Enviar</span>
+                </button>
+                <button mat-menu-item [routerLink]="'/ventas/nuevo'">
+                  <mat-icon class="s-20">insert_drive_file</mat-icon>
+                  <span>Nota de crédito</span>
+                </button>
+                <button mat-menu-item [routerLink]="'/ventas/nuevo'">
+                  <mat-icon class="s-20">insert_drive_file</mat-icon>
+                  <span>Nota de débito</span>
+                </button>
+              </mat-menu>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="empty">
+          <mat-footer-cell *matFooterCellDef>
+            No hay registros.
+          </mat-footer-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="dcVenta;"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: dcVenta;" class="entidad" (click)="showVenta(row)" matRipple>
+        </mat-row>
+        <mat-footer-row *matFooterRowDef="['empty']" [ngClass]="{'hide': rLengthVenta > 0 || loadVenta}">
+        </mat-footer-row>
+      </mat-table>
+
+      <mat-paginator #pagVenta [length]="rLengthVenta" [pageSize]="pSizeVenta"></mat-paginator>
+
+    </div>
+    <!-- / CONTENT CARD -->
+  </div>
+  <!-- / CENTER -->
+</div>

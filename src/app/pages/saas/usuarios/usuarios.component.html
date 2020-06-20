@@ -1,0 +1,152 @@
+<vex-page-layout>
+
+  <vex-page-layout-header class="pb-16" fxLayout="column" fxLayoutAlign="center start">
+    <div class="w-full flex flex-col sm:flex-row justify-between px-gutter">
+      <div>
+        <h1 class="title mt-0 mb-1">Usuarios</h1>
+        <vex-breadcrumbs [crumbs]="['Configuración', 'Usuarios']"></vex-breadcrumbs>
+      </div>
+      <div>
+        <button mat-raised-button type="button" (click)="newEntidad()" fxHide fxShow.gt-xs>
+          <mat-icon [icIcon]="icAdd"></mat-icon> Nuevo
+        </button>
+        <button mat-icon-button type="button" (click)="newEntidad()" fxShow fxHide.gt-xs>
+          <mat-icon [icIcon]="icAdd"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </vex-page-layout-header>
+
+  <vex-page-layout-content class="-mt-6  px-gutter">
+
+    <div class="card overflow-auto -mt-16">
+      <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+        <div class="bg-card rounded-full border px-4" fxFlex="50" fxFlex.lt-md="auto" fxHide.xs fxLayout="row"
+          fxLayoutAlign="start center">
+          <input matInput #nombreERef [matAutocomplete]="auto" [formControl]="cliente" placeholder="Buscar nombre"
+            class="px-4 py-3 border-0 outline-none w-full bg-transparent">
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displaySearchEntidad"
+            (optionSelected)='index(true)'>
+            <mat-option *ngIf="isLoadingSearch" (keyup.enter)="index(true);">
+              <mat-spinner diameter="50"></mat-spinner>
+            </mat-option>
+            <ng-container *ngIf="!isLoadingSearch">
+              <mat-option *ngFor="let state of searchResult.data" [value]="state">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                  <div fxLayout="column" fxLayoutAlign="center start">
+                    <ic-icon [icIcon]="icAccountCircle" size="24px"></ic-icon>
+                  </div>
+                  <div fxLayout="column" fxLayoutAlign="center stretch">
+                    <small>{{ state.name }}</small>
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <small class="text-secondary inline-block">Correo</small>
+                      <small class="text-secondary">{{ state.email }}</small>
+                    </div>
+                  </div>
+                </div>
+              </mat-option>
+
+              <div fxLayout="row" fxLayoutAlign="start center">
+                <p>Mostrando {{searchResult.to}} de {{searchResult.total}} resultados.</p>
+              </div>
+            </ng-container>
+          </mat-autocomplete>
+
+          <button *ngIf="!cliente.value" mat-icon-button matSuffix type="button">
+            <mat-icon [icIcon]="icSearch" size="20px"></mat-icon>
+          </button>
+          <button *ngIf="cliente.value" (click)="cliente.setValue(''); index(true);" mat-icon-button matSuffix
+            type="button">
+            <mat-icon [icIcon]="icClose" size="20px"></mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="loading-container">
+        <div class="loading-shade" *ngIf="loadEntidad">
+          <mat-spinner></mat-spinner>
+        </div>
+
+        <table mat-table #table [dataSource]="dsEntidad" #sortEntidad="matSort" matSort matSortActive="name"
+          matSortDisableClear matSortDirection="asc" class="w-full">
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>NOMBRE COMPLETO</th>
+            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>CORREO</th>
+            <td mat-cell *matCellDef="let element"> {{element.email}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="celular">
+            <th mat-header-cell *matHeaderCellDef>TELÉFONO</th>
+            <td mat-cell *matCellDef="let element"> {{element.celular}} </td>
+          </ng-container>
+
+
+
+          <ng-container matColumnDef="acceso">
+            <th mat-header-cell *matHeaderCellDef class="text-center">ACTIVO?</th>
+            <td mat-cell *matCellDef="let element" class="text-center">
+              <mat-icon size="18px" *ngIf="element.acceso === '0' || !element.acceso" [icIcon]="icCheckBoxOutlineBlank">
+              </mat-icon>
+              <mat-icon size="18px" *ngIf="element.acceso === '1'" [icIcon]="icCheck"></mat-icon>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="administrador">
+            <th mat-header-cell *matHeaderCellDef class="text-center">ADMIN?</th>
+            <td mat-cell *matCellDef="let element" class="text-center">
+              <mat-icon size="18px" *ngIf="element.administrador === '0' || !element.administrador"
+                [icIcon]="icCheckBoxOutlineBlank">
+              </mat-icon>
+              <mat-icon size="18px" *ngIf="element.administrador === '1'" [icIcon]="icCheck"></mat-icon>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="sedes">
+            <th mat-header-cell *matHeaderCellDef>LOCALES</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip-list>
+                <mat-chip color="primary" *ngFor="let item of element.sedes">{{item.nombre}}</mat-chip>
+              </mat-chip-list>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>
+              ACCIONES
+            </th>
+            <td mat-cell *matCellDef="let item">
+              <div fxLayout="row" fxLayoutAlign="center center">
+                <button type="button" mat-icon-button (click)="$event.stopPropagation(); deleteEntidad(item);"
+                  matTooltip="Eliminar" class="w-8 h-8 leading-none flex items-center justify-center hover:bg-hover">
+                  <mat-icon [icIcon]="icDelete" size="18px"></mat-icon>
+                </button>
+                <button type="button" mat-icon-button (click)="$event.stopPropagation(); editEntidad(item);"
+                  matTooltip="Editar" class="w-8 h-8 leading-none flex items-center justify-center ml-1 hover:bg-hover">
+                  <mat-icon [icIcon]="icEdit" size="18px"></mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="empty">
+            <mat-footer-cell *matFooterCellDef>
+              No hay registros.
+            </mat-footer-cell>
+          </ng-container>
+
+          <tr *matHeaderRowDef="dcEntidad" mat-header-row></tr>
+          <tr *matRowDef="let row; columns: dcEntidad;" (click)="showEntidad(row)"
+            class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+          <tr mat-footer-row *matFooterRowDef="['empty']" [ngClass]="{'hide': rLengthEntidad > 0 || loadEntidad}"></tr>
+        </table>
+        <mat-paginator #pagEntidad [length]="rLengthEntidad" [pageSize]="pSizeEntidad"></mat-paginator>
+      </div>
+    </div>
+  </vex-page-layout-content>
+
+</vex-page-layout>

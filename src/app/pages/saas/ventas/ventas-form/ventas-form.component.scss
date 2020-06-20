@@ -1,0 +1,44 @@
+#ventas-form {
+    .content {
+        padding: 24px;
+
+        fieldset {
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+            padding: 8px;
+
+            legend {
+                padding: 0px 8px 0px 8px;
+            }
+        }
+    }
+
+
+    .cardcustom {
+        mat-card-header {
+            margin: -16px -16px 0px -16px;
+
+            mat-toolbar {
+                border-radius: 4px 4px 0px 0px;
+            }
+        }
+
+        .mat-card-header-text {
+            margin: 0px;
+        }
+    }
+
+    .mat-select-panel mat-option.mat-option {
+        height: unset;
+        border: 1px solid #f00;
+    }
+
+    .mat-option-text.mat-option-text {
+        white-space: normal;
+        border: 1px solid #f00;
+    }
+
+    .borde{
+        border: 1px solid #000 !important;
+    }
+}

@@ -1,0 +1,27 @@
+.presupuesto-tpv-dialog {
+     
+    .mat-dialog-container {
+        padding: 0;
+    }
+    .dialog-content-wrapper {
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+    }
+    table {
+        width: 100%;
+        td {
+            padding: 4px;
+        }
+    }
+    fieldset {
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        legend {
+            padding: 0px 8px 0px 8px;
+        }
+    }
+    mat-form-field.mat-form-field {
+        font-size: 12px;
+    } 
+}

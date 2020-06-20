@@ -1,0 +1,35 @@
+.masivoitem-form-dialog {
+    @screen sm {
+        // width: 100%;
+    }
+
+    @screen md {
+        width: 600px;
+    }
+
+    .mat-dialog-container {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .mat-dialog-content {
+        padding: 0px 16px;
+        margin: 0px;
+    }
+
+    .mat-dialog-actions {
+        padding: 16px 24px;
+        margin: 0px;
+    }
+
+    fieldset {
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        padding: 8px;
+
+        legend {
+            font-weight: 500;
+            padding: 0px 8px 0px 8px;
+        }
+    }
+}

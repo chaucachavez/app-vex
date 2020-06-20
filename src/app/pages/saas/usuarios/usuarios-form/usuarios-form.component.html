@@ -1,0 +1,128 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<form [formGroup]="usuarioForm" (ngSubmit)="save()" *ngIf="!loading">
+
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">{{dialogTitle}}</h2>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" matTooltip="Cerrar">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+
+    <fieldset fxLayout="column">
+      <legend>Usuario</legend>
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+          <mat-label>Correo</mat-label>
+          <input cdkFocusInitial formControlName="email" matInput>
+          <mat-error *ngIf="usuarioForm.get('email').hasError('required')">
+            Email Es requerido
+          </mat-error>
+          <mat-icon [icIcon]="icEmail" class="mr-1" matPrefix></mat-icon>
+        </mat-form-field>
+
+
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+          <mat-label>Contraseña</mat-label>
+          <input [type]="inputType" formControlName="password" matInput autocomplete="new-password">
+          <button (click)="toggleVisibility()" mat-icon-button matSuffix matTooltip="Ver contraseña" type="button">
+            <mat-icon *ngIf="visible" [icIcon]="icVisibility"></mat-icon>
+            <mat-icon *ngIf="!visible" [icIcon]="icVisibilityOff"></mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+          <mat-label>Nombre completo</mat-label>
+          <input cdkFocusInitial formControlName="name" matInput>
+          <mat-icon [icIcon]="icPerson" class="mr-1" matPrefix></mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+          <mat-label>Teléfono</mat-label>
+          <input cdkFocusInitial formControlName="celular" matInput>
+          <mat-icon [icIcon]="icPhone" class="mr-1" matPrefix></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-slide-toggle formControlName="acceso" labelPosition="after">Activo <em>(Permitir acceso al Software)</em>
+        </mat-slide-toggle>
+      </div>
+      <!-- <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+          <mat-label>Contraseña</mat-label>
+          <input [type]="inputTypeConfirm" formControlName="passwordconfirm" matInput>
+          <button (click)="toggleConfirmVisibility()" mat-icon-button matSuffix matTooltip="Ver contraseña"
+            type="button">
+            <mat-icon *ngIf="visibleConfirm" [icIcon]="icVisibility"></mat-icon>
+            <mat-icon *ngIf="!visibleConfirm" [icIcon]="icVisibilityOff"></mat-icon>
+          </button>
+        </mat-form-field>
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+          <mat-label>Acceso</mat-label>
+          <input cdkFocusInitial formControlName="acceso" matInput>
+          <mat-icon [icIcon]="icPerson" class="mr-1" matPrefix></mat-icon>
+        </mat-form-field>
+      </div> -->
+    </fieldset>
+
+    <fieldset fxLayout="column" class="mt-4">
+      <legend>Local asignado</legend>
+      <mat-selection-list formControlName="sedes">
+        <mat-list-option *ngFor="let row of sedes" [value]="row.idsede">
+          <span>{{row.nombre | uppercase}}</span>
+        </mat-list-option>
+      </mat-selection-list>
+    </fieldset>
+
+
+    <fieldset fxLayout="column" class="mt-4">
+      <legend>Permisos para este usuario</legend>
+      <div formArrayName="modulos">
+
+        <!-- <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+          fxLayoutGap="8px" fxLayoutGap.lt-sm="0"> 
+          <div fxFlex="90" class="borde">Opción</div>
+          <div fxFlex="10" class="borde">Acción</div>
+        </div> -->
+
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+          fxLayoutGap="8px" fxLayoutGap.lt-sm="0"
+          *ngFor="let itemCtrol of usuarioForm.get('modulos')['controls']; index as i" [formGroupName]="i">
+          <div fxFlex="70" class="borde">
+            <mat-slide-toggle formControlName="activo" labelPosition="after"> {{itemCtrol.get('nombre').value}}
+              <em *ngIf="itemCtrol.get('anotacion').value">({{itemCtrol.get('anotacion').value}})</em>
+            </mat-slide-toggle>
+          </div>
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="30" class="vex-flex-form-field">
+            <mat-label>Permiso</mat-label>
+            <mat-select name="permiso" formControlName="permiso" [disabled]="!itemCtrol.get('activo').value">
+              <mat-option *ngFor="let item of acciones" [value]="item.permiso">
+                {{ item.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="usuarioForm.get('modulos')['controls'][i].controls['permiso'].hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- <fieldset fxLayout="column" class="mt-4">
+      <pre>{{usuarioForm.value | json}}</pre>
+    </fieldset> -->
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button color="primary" mat-raised-button type="submit" [disabled]="usuarioForm.invalid">GUARDAR</button>
+  </mat-dialog-actions>
+
+</form>

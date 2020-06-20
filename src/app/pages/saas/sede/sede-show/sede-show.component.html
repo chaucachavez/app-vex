@@ -1,0 +1,137 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<div *ngIf="!loading">
+
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">{{sede.nombre}}</h2>
+      <button class="text-secondary" mat-icon-button type="button" (click)="matDialogRef.close('delete')"
+        matTooltip="Eliminar">
+        <mat-icon [icIcon]="icDelete"></mat-icon>
+      </button>
+      <button class="text-secondary" mat-icon-button type="button" (click)="matDialogRef.close('edit')"
+        matTooltip="Editar">
+        <mat-icon [icIcon]="icEdit"></mat-icon>
+      </button>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" matTooltip="Cerrar">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <mat-tab-group fxFlex="auto" #tabGroup (selectedTabChange)="handleTabChange($event)"
+      [selectedIndex]="activeTabIndex" [color]="'accent'" [backgroundColor]="'primary'">
+      <mat-tab label="LOCAL"></mat-tab>
+      <mat-tab label="IMPRESIÓN"></mat-tab>
+      <mat-tab label="JSON"></mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+    <div *ngIf="activeTabIndex === 0">
+      <fieldset>
+        <legend>Local</legend>
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+          <div fxFlex="20">Nombre</div>
+          <div fxFlex="30">{{sede.nombre}}</div>
+          <div fxFlex="20">Código local</div>
+          <div fxFlex="30">{{sede.abreviatura}}</div>
+        </div>
+
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+          <div fxFlex="20">Código Sunat</div>
+          <div fxFlex="30">{{sede.codigosunat}}</div>
+          <div fxFlex="20">Departamento</div>
+          <div fxFlex="30">{{sede.departamento}}</div>
+        </div>
+
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+          <div fxFlex="20">Provincia</div>
+          <div fxFlex="30">{{sede.provincia}}</div>
+          <div fxFlex="20">Distrito</div>
+          <div fxFlex="30">{{sede.distrito}}</div>
+        </div>
+
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+          <div fxFlex="20">Dirección</div>
+          <div fxFlex="80">{{sede.direccion}}</div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-4">
+        <legend>Comprobantes y series</legend>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+          fxLayoutGap="8px" fxLayoutGap.lt-sm="0">
+          <div fxFlex="55">Comprobante</div>
+          <div fxFlex="15">Serie</div>
+          <div fxFlex="15">Número</div>
+          <div fxFlex="15">Contingencia</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+          fxLayoutGap="8px" fxLayoutGap.lt-sm="0" *ngFor="let item of sede.comprobantes" class="b-t-1">
+          <div fxFlex="55">{{item.documentofiscal.nombre}}</div>
+          <div fxFlex="15">{{item.serie}}</div>
+          <div fxFlex="15">{{item.numero}}</div>
+          <div fxFlex="15">
+            <mat-icon [icIcon]="icCheck" size="18px" color="primary" *ngIf="item.contingencia === '1'"></mat-icon>
+          </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+          *ngIf="sede.comprobantes.length === 0">
+          <div fxFlex>No hay registros.</div>
+        </div>
+      </fieldset>
+      
+    </div>
+
+    <div *ngIf="activeTabIndex === 1">
+      <fieldset>
+        <legend>Formato de impresión PDF</legend>
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+          <div fxFlex="20">Factura</div>
+          <div fxFlex="30">
+            <span>{{sede.pdffactura}}</span>
+          </div>
+          <div fxFlex="20">Boleta de venta</div>
+          <div fxFlex="30">
+            <span>{{sede.pdfboleta}}</span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-4">
+        <legend>Texto cabecera de PDF(Ejemplo: Teléfono, email, página web Etc.)</legend>
+
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+          <div fxFlex="20">Cabecera</div>
+          <div fxFlex="80">{{sede.pdfcabecera}}</div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-4">
+        <legend>Texto nombre comercial de PDF</legend>
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+          <div fxFlex="20">Nombre</div>
+          <div fxFlex="80">{{sede.pdfnombre}}</div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-4">
+        <legend>Color base de PDF</legend>
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+          <div fxFlex="20">Color</div>
+          <div fxFlex="80">{{sede.pdfcolor}}</div>
+        </div>
+      </fieldset>
+    </div>
+    <div *ngIf="activeTabIndex === 2">
+      <pre>{{sede | json}}</pre>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close aria-label="CERRAR">
+      CERRAR
+    </button>
+  </mat-dialog-actions>
+
+</div>

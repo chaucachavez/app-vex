@@ -1,0 +1,29 @@
+<!-- <style>
+  .borde {
+    border: 1px solid black;
+  }
+</style> -->
+<form [formGroup]="sedeForm" (ngSubmit)="save()">
+
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">Seleccione sede</h2>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+
+    <mat-radio-group formControlName="idsede" fxLayout="column" fxLayoutAlign="start stretch" class="mt-2 mb-2">
+      <mat-radio-button [value]="item.idsede" *ngFor="let item of sedes">
+        <p class="pt-2 pb-2">{{item.nombre}}</p>
+      </mat-radio-button>
+    </mat-radio-group>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button" (click)="salir()" *ngIf="exit">SALIR</button>
+    <button color="primary" mat-raised-button type="submit" [disabled]="sedeForm.invalid">ACEPTAR</button>
+  </mat-dialog-actions>
+
+</form>

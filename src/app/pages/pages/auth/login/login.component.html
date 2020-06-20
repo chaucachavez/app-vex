@@ -1,0 +1,52 @@
+<div class="w-full h-full bg-pattern" fxLayout="column" fxLayoutAlign="center center">
+  <div @fadeInUp class="card overflow-hidden w-full max-w-xs">
+    <vex-loading *ngIf="submitted"></vex-loading>
+    <div class="p-6 pb-0" fxLayout="column" fxLayoutAlign="center center">
+      <div class="fill-current text-center">
+        <img class="w-20" src="assets/img/logos/logo_cuadrado.png">
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <h2 class="title m-0">Ingresar</h2>
+      <h4 class="body-2 text-secondary m-0">
+        Software contable y planillas
+      </h4>
+    </div>
+
+    <!-- <form [formGroup]="loginForm" class="p-6" fxLayout="column" fxLayoutGap="16px" (ngSubmit)="authenticar()"> -->
+    <form [formGroup]="loginForm" class="p-6" fxLayout="column" (ngSubmit)="authenticar()">
+      <div fxFlex="auto" fxLayout="column">
+        <mat-form-field fxFlex="grow">
+          <mat-label>Correo</mat-label>
+          <input formControlName="email" matInput #email required>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="grow">
+          <mat-label>Contraseña</mat-label>
+          <input [type]="inputType" formControlName="password" matInput required>
+          <button (click)="toggleVisibility()" mat-icon-button matSuffix matTooltip="Toggle Visibility" type="button">
+            <mat-icon *ngIf="visible" [icIcon]="icVisibility"></mat-icon>
+            <mat-icon *ngIf="!visible" [icIcon]="icVisibilityOff"></mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <mat-checkbox class="caption" color="primary">Recuérdame</mat-checkbox>
+        <a [routerLink]="['/recuperar-contrasena']" class="caption">¿Has olvidado tu contraseña?</a>
+      </div>
+
+      <button color="primary" mat-raised-button type="submit" [disabled]="loginForm.invalid || submitted" class="mt-4">
+        INGRESAR
+      </button>
+
+      <p class="text-secondary text-center mt-4">
+        ¿Aún no tienes una cuenta?
+      </p>
+      <!-- <a [routerLink]="['/register']" class="mt-1">CREAR CUENTA</a> -->
+      <a color="primary" mat-button [routerLink]="['/register']">CREAR CUENTA</a>
+    </form>
+
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<vex-loading *ngIf="submitted"></vex-loading>
+
+<form [formGroup]="regenerarForm" (ngSubmit)="save()">
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">Regenerar PDF</h2>
+    <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+    <mat-form-field appearance="standard">
+      <mat-label>Comprobante</mat-label>
+      <input matInput formControlName="comprobante" [readonly]="true">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" [floatLabel]="'always'">
+      <mat-label>Formato impresión</mat-label>
+      <!-- <input matInput formControlName="pdfformato" #pdfformato required> -->
+      <mat-select formControlName="pdfformato" required>
+        <mat-option *ngFor="let item of formatos" [value]="item.id">
+          {{ item.nombre }}
+        </mat-option>
+      </mat-select>
+      <mat-icon [icIcon]="icPictureAsPdf" class="mr-2" matPrefix></mat-icon>
+      <mat-error *ngIf="regenerarForm.get('pdfformato').hasError('required')">
+        Es requerido
+      </mat-error>
+    </mat-form-field>
+
+    <!-- <mat-form-field appearance="standard" fxFlex="auto">
+        <mat-label>Factura</mat-label>
+        <mat-select formControlName="pdffactura">
+          <mat-option *ngFor="let item of formatos" [value]="item.id">
+            {{ item.nombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="sedeForm.get('pdffactura').hasError('required')">
+          Es requerido
+        </mat-error>
+      </mat-form-field> -->
+
+    <!-- <pre>
+        {{correoForm.value | json}} 
+      </pre> -->
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button color="primary" mat-raised-button type="submit"
+      [disabled]="regenerarForm.invalid || submitted">ACEPTAR</button>
+  </mat-dialog-actions>
+
+</form>

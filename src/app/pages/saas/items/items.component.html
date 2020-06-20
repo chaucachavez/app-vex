@@ -1,0 +1,182 @@
+<vex-page-layout>
+  <vex-page-layout-header class="pb-16" fxLayout="column" fxLayoutAlign="center start">
+    <div class="w-full flex flex-col sm:flex-row justify-between px-gutter">
+      <div>
+        <h1 class="title mt-0 mb-1" (click)="resetForm()">Productos</h1>
+        <vex-breadcrumbs [crumbs]="['Productos']"></vex-breadcrumbs>
+      </div>
+      <div>
+
+        <button mat-raised-button matTooltip="Subir Excel" (click)="modalCargamasiva()" fxHide fxShow.gt-xs>
+          <mat-icon [icIcon]="icCloudUpload"></mat-icon> Subir
+        </button>
+        <button mat-icon-button fxShow fxHide.gt-xs (click)="newProducto()">
+          <mat-icon [icIcon]="icCloudUpload"></mat-icon>
+        </button>
+        <a mat-raised-button matTooltip="Descargar Excel" class="ml-1" fxHide fxShow.gt-xs
+          (click)="descargaMasiva('excel')">
+          <mat-icon [icIcon]="icCloudDownload"></mat-icon> Descargar
+        </a>
+        <button mat-icon-button fxShow fxHide.gt-xs (click)="newProducto()">
+          <mat-icon [icIcon]="icCloudDownload"></mat-icon>
+        </button>
+        <button mat-raised-button fxHide fxShow.gt-xs class="ml-1" (click)="newProducto()">
+          <mat-icon [icIcon]="icAdd"></mat-icon> Nuevo
+        </button>
+        <button mat-icon-button matTooltip="button" type="button" fxShow fxHide.gt-xs (click)="newProducto()">
+          <mat-icon [icIcon]="icAdd">add</mat-icon>
+        </button>
+      </div>
+    </div>
+  </vex-page-layout-header>
+
+  <vex-page-layout-content class="-mt-6 px-gutter">
+
+    <div class="card overflow-auto -mt-16">
+      <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+
+        <div class="bg-card rounded-full border px-4" fxFlex="50" fxFlex.lt-md="auto" fxHide.xs fxLayout="row"
+          fxLayoutAlign="start center">
+          <input matInput #nombreERef [matAutocomplete]="auto" [formControl]="producto" placeholder="Buscar nombre"
+            class="px-4 py-3 border-0 outline-none w-full bg-transparent">
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displaySearchProducto"
+            (optionSelected)='index(true)'>
+            <mat-option *ngIf="isLoadingSearch" (keyup.enter)="index(true);">
+              <mat-spinner diameter="25"></mat-spinner>
+            </mat-option>
+            <ng-container *ngIf="!isLoadingSearch">
+              <mat-option *ngFor="let item of searchResult.data" [value]="item">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                  <div fxLayout="column" fxLayoutAlign="center start">
+                    <ic-icon [icIcon]="icLocalOffer" size="24px"></ic-icon>
+                  </div>
+                  <div fxLayout="column" fxLayoutAlign="center stretch">
+                    <small>{{ item.nombre }}</small>
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <small class="text-secondary inline-block">SKU</small>
+                      <small class="text-secondary">{{ item.codigo }}</small>
+                    </div>
+                  </div>
+                </div>
+              </mat-option>
+              <div fxLayout="row" fxLayoutAlign="start center">
+                <p>Mostrando {{searchResult.to}} de {{searchResult.total}} resultados.</p>
+              </div>
+            </ng-container>
+          </mat-autocomplete>
+          <button *ngIf="!producto.value" mat-icon-button matSuffix type="button">
+            <mat-icon [icIcon]="icSearch" size="20px"></mat-icon>
+          </button>
+          <button *ngIf="producto.value" (click)="producto.setValue('');" mat-icon-button matSuffix type="button">
+            <mat-icon [icIcon]="icClose" size="20px"></mat-icon>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="loading-container">
+        <div class="loading-shade" *ngIf="loadProducto">
+          <mat-spinner></mat-spinner>
+        </div>
+
+        <table mat-table #table [dataSource]="dsProducto" #sortProducto="matSort" matSort matSortActive="nombre"
+          matSortDisableClear matSortDirection="asc" class="w-full">
+
+          <ng-container matColumnDef="codigo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>CÓDIGO</th>
+            <td *matCellDef="let item"> {{item.codigo}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>NOMBRE</th>
+            <td *matCellDef="let item"> {{item.nombre}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="unidadmedida">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>MEDIDA</th>
+            <td *matCellDef="let item"> {{item.unidadmedida}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="moneda">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>MONEDA</th>
+            <td *matCellDef="let item"> {{item.moneda}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="valorventa">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>PRECIO</th>
+            <td *matCellDef="let item"> {{item.valorventa}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="idimpuesto">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>IMPUESTO</th>
+            <td *matCellDef="let item" [ngSwitch]="item.idimpuesto">
+              <span *ngSwitchCase="1">Igv</span>
+              <span *ngSwitchCase="2">Gratuita</span>
+              <span *ngSwitchCase="3">Gratuita</span>
+              <span *ngSwitchCase="4">Gratuita</span>
+              <span *ngSwitchCase="5">Gratuita</span>
+              <span *ngSwitchCase="6">Gratuita</span>
+              <span *ngSwitchCase="7">Gratuita</span>
+              <span *ngSwitchCase="8">Exonerado</span>
+              <span *ngSwitchCase="9">Inafecto</span>
+              <span *ngSwitchCase="10">Gratuita</span>
+              <span *ngSwitchCase="11">Gratuita</span>
+              <span *ngSwitchCase="12">Gratuita</span>
+              <span *ngSwitchCase="13">Gratuita</span>
+              <span *ngSwitchCase="14">Gratuita</span>
+              <span *ngSwitchCase="15">Gratuita</span>
+              <span *ngSwitchCase="16">Exportación</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="stock">
+            <th mat-header-cell *matHeaderCellDef>STOCK</th>
+            <td *matCellDef="let item">{{item.stock}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="categoria">
+            <th mat-header-cell *matHeaderCellDef>CATEGORIA</th>
+            <td *matCellDef="let item">{{item.categoria?.nombre}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>
+              ACCIONES
+            </th>
+            <td mat-cell *matCellDef="let item">
+              <div fxLayout="row" fxLayoutAlign="center center">
+                <button type="button" mat-icon-button (click)="$event.stopPropagation(); deleteProducto(item);"
+                  matTooltip="Eliminar" class="w-8 h-8 leading-none flex items-center justify-center hover:bg-hover">
+                  <mat-icon [icIcon]="icDelete" size="18px"></mat-icon>
+                </button>
+                <button type="button" mat-icon-button (click)="$event.stopPropagation(); editProducto(item.idproducto);"
+                  matTooltip="Editar" class="w-8 h-8 leading-none flex items-center justify-center ml-1 hover:bg-hover">
+                  <mat-icon [icIcon]="icEdit" size="18px"></mat-icon>
+                </button>
+                <button type="button" mat-icon-button (click)="$event.stopPropagation(); editProducto(item.idproducto);"
+                  matTooltip="Movimiento"
+                  class="w-8 h-8 leading-none flex items-center justify-center ml-1 hover:bg-hover">
+                  <mat-icon [icIcon]="icSwapHoriz" size="18px"></mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="empty">
+            <mat-footer-cell *matFooterCellDef>
+              No hay registros.
+            </mat-footer-cell>
+          </ng-container>
+
+          <tr *matHeaderRowDef="dcProducto" mat-header-row></tr>
+          <tr *matRowDef="let row; columns: dcProducto;" (click)="showProducto(row)"
+            class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+          <tr mat-footer-row *matFooterRowDef="['empty']" [ngClass]="{'hide': rLengthProducto > 0 || loadProducto}">
+          </tr>
+        </table>
+        <mat-paginator #pagProducto [length]="rLengthProducto" [pageSizeOptions]="pSizeOptProducto"
+          [pageSize]="pSizeProducto" class="sticky left-0"></mat-paginator>
+      </div>
+    </div>
+  </vex-page-layout-content>
+</vex-page-layout>

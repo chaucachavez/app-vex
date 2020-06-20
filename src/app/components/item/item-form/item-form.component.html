@@ -1,0 +1,251 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<form [formGroup]="productoForm" (ngSubmit)="save()" *ngIf="!loading">
+
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">{{dialogTitle}}</h2>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <mat-tab-group fxFlex="auto" #tabGroup (selectedTabChange)="handleTabChange($event)"
+      [selectedIndex]="activeTabIndex" [color]="'accent'" [backgroundColor]="'primary'">
+      <mat-tab label="GENERAL"></mat-tab>
+      <mat-tab label="TIENDA VIRTUAL"></mat-tab>
+      <mat-tab label="STOCK"></mat-tab>
+    </mat-tab-group>
+
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+    <div *ngIf="activeTabIndex === 0">
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="nombre" #nombre maxlength="200" required>
+          <mat-error *ngIf="productoForm.get('nombre').hasError('required')">
+            Es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+          <mat-label>Medida</mat-label>
+          <mat-select formControlName="unidadmedida" required>
+            <mat-option *ngFor="let item of unidadMedidas" [value]="item.codigo">
+              {{item.codigo}} - {{ item.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="productoForm.get('unidadmedida').hasError('required')">
+            Es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+          <mat-label>Sku (Código único del producto/servicio)</mat-label>
+          <input matInput formControlName="codigo" maxlength="16" required>
+          <mat-error *ngIf="productoForm.get('codigo').hasError('required')">
+            Es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+          <mat-label>Impuesto venta</mat-label>
+          <mat-select formControlName="idimpuesto" required>
+            <mat-option *ngFor="let item of impuestos" [value]="item.idimpuesto">
+              {{ item.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div fxLayout="row" fxLayoutGap="8px" fxFlex="50">
+          <mat-form-field appearance="standard" floatLabel="always" class="vex-flex-form-field" fxFlex="auto">
+            <mat-label>Moneda</mat-label>
+            <mat-select formControlName="moneda">
+              <mat-option *ngFor="let item of monedas" [value]="item.moneda">
+                {{ item.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div fxFlex="70">
+            <mat-form-field appearance="standard" floatLabel="always" class="vex-flex-form-field" fxFlex="auto"
+              *ngIf="!settings.preciounitario">
+              <mat-label>Valor venta</mat-label>
+              <input matInput type="number" formControlName="costoventa" required>
+            </mat-form-field>
+            <mat-form-field appearance="standard" floatLabel="always" class="vex-flex-form-field" fxFlex="auto"
+              *ngIf="settings.preciounitario">
+              <mat-label>Precio venta</mat-label>
+              <input matInput type="number" formControlName="valorventa" required>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+          <mat-label>
+            <span>Código Sunat</span>
+            <i *ngIf="productoForm.get('codigosunat').value">
+              ({{productoForm.get('codigosunat').value}})
+            </i>
+          </mat-label>
+          <input matInput [matAutocomplete]="auto" [formControl]="catalogo">
+          <mat-autocomplete autoActiveFirstOption panelWidth="530px" #auto="matAutocomplete"
+            [displayWith]="displaySearchCatalogo"
+            (optionSelected)="autocompletadoCatalogoSelected($event.option.value)">
+            <mat-option *ngIf="isLoadingSearch" class="p-3" value="">
+              <mat-spinner diameter="25"></mat-spinner>
+            </mat-option>
+            <ng-container *ngIf="!isLoadingSearch">
+              <mat-option *ngFor="let item of searchResult.data" [value]="item">
+                <div fxLayout="column" fxLayoutAlign="center start">
+                  <small>{{ item.nombre}}</small>
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                    <small class="text-secondary">{{ item.codigo }}</small>
+                  </div>
+                </div>
+
+                <!-- <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                <div fxLayout="column" fxLayoutAlign="center start">                  
+                  <ic-icon [icIcon]="icLocalOffer" size="24px"></ic-icon>
+                </div>
+                <div fxLayout="column" fxLayoutAlign="center stretch">
+                  <small>{{ item.nombre }}</small>
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">                   
+                    <small class="text-secondary inline-block">SKU</small>
+                    <small class="text-secondary">{{ item.codigo }}</small>
+                  </div>
+                </div>
+              </div> -->
+              </mat-option>
+              <div fxLayout="row">
+                <small class="p-3">Mostrando {{searchResult.to}} de {{searchResult.total}} resultados.</small>
+              </div>
+            </ng-container>
+
+
+          </mat-autocomplete>
+          <mat-icon matSuffix *ngIf="!catalogo.value" [icIcon]="icArrowDropDown"></mat-icon>
+          <mat-icon matSuffix *ngIf="catalogo.value" [icIcon]="icClose" (click)="catalogo.setValue('');"></mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+          <mat-label>Categoría</mat-label>
+          <mat-select formControlName="idcategoria">
+            <mat-option>(Sin categoria)</mat-option>
+            <mat-option *ngFor="let item of categorias" [value]="item.idcategoria">
+              {{ item.codigo }} - {{ item.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- </fieldset> -->
+
+      <!-- <fieldset fxLayout="column" class="mt-4">
+      <legend>Precio unitario</legend> 
+    </fieldset> -->
+
+      <!-- <pre>
+      {{productoForm.value | json}}
+    </pre> -->
+    </div>
+
+    <div *ngIf="activeTabIndex === 1">
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="8px" fxLayoutGap.lt-sm="0">
+        <div fxFlex="80">
+          <h3>
+            {{productoForm.get('nombre').value}}
+          </h3>
+          <a href="https://platanitos.com/puma-nova-2-wn-s-negro-morado-171649" target="_blank">
+            https://platanitos.com/puma-nova-2-wn-s-negro-morado-171649
+          </a>
+        </div>
+        <div fxFlex="20">
+          <div class="b-1">Público/Privado</div>
+        </div>
+      </div>
+
+      <fieldset class="mt-4">
+        <legend>Imágenes</legend>
+        <div>Img1 (edit) (View)</div>
+        <div>Img2 (edit) (View) (portada)</div>
+        <div>Img3 (edit) (View) </div>
+        <div>
+          <input type="file">
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-4">
+        <legend>Precio</legend>
+        <table class="table-hover">
+          <tbody>
+            <tr>
+              <td width="25%">Precio actual:</td>
+              <td width="75%">S/ 80.00</td>
+            </tr>
+            <tr>
+              <td><del>Precio anterior</del>:</td>
+              <td>S/ 90.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </fieldset>
+
+      <fieldset class="mt-4">
+        <legend>Información</legend>
+        Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+        Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+        lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+        lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+        lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+      </fieldset>
+
+      <fieldset class="mt-4">
+        <legend>Características</legend>
+        <table class="table-hover">
+          <tbody>
+            <tr>
+              <td width="25%"><i>Fabricante</i></td>
+              <td width="75%">Insumos de Riego</td>
+            </tr>
+            <tr>
+              <td><i>Marca</i></td>
+              <td>Insumos de Riego</td>
+            </tr>
+            <tr>
+              <td><i>Modelo</i></td>
+              <td>63mm X 1/2</td>
+            </tr>
+          </tbody>
+        </table>
+      </fieldset>
+
+      <fieldset class="mt-4">
+        ¿Es un producto nuevo? SI/NO
+      </fieldset>
+
+      <fieldset class="mt-4 mb-1">
+        <legend>Youtube(Opcional)</legend>
+        <iframe width="100%" height="315" src="https://www.youtube.com/embed/JitOuCe-IjQ" frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </fieldset>
+    </div>
+
+    <div *ngIf="activeTabIndex === 2">
+      Stock de productos por local
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button color="primary" mat-raised-button type="submit"
+      [disabled]="productoForm.invalid || submitted">GUARDAR</button>
+  </mat-dialog-actions>
+</form>

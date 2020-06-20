@@ -1,0 +1,112 @@
+<form [formGroup]="itemForm" (ngSubmit)="save()">
+
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">Detalle de linea</h2>
+    <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+
+    <mat-form-field appearance="standard">
+      <mat-label>Producto / servicio</mat-label>
+      <input matInput [matAutocomplete]="auto" formControlName="producto" #producto>
+      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayProductoFn"
+        (optionSelected)="autocompletadoProductoSelected($event.option.value)">
+        <mat-option *ngFor="let item of  filteredOptions | async" [value]="item">
+          <div fxLayout="row" fxLayoutAlign="space-between center">
+            <small fxFlex="80">{{ item.nombre | uppercase}}</small>
+            <small fxFlex="10">{{ item.codigo}}</small>
+            <small fxFlex="10">S/. {{ item.precio}}</small>
+          </div>
+        </mat-option>
+      </mat-autocomplete>
+      <mat-icon matSuffix [icIcon]="icSearch" *ngIf="!itemForm.get('producto').value">
+      </mat-icon>
+      <mat-icon matSuffix [icIcon]="icClose" *ngIf="itemForm.get('producto').value"
+        (click)="itemForm.get('producto').setValue('');" class="cursor-pointer"></mat-icon>
+      <mat-error *ngIf="itemForm.get('producto').hasError('required')">
+        Requerido!
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="standard">
+      <mat-label>Descripción adicional</mat-label>
+      <input matInput formControlName="descripcion">
+    </mat-form-field>
+
+    <fieldset class="mt-4">
+
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" fxFlex="auto">
+          <mat-label>Tipo IGV</mat-label>
+          <mat-select placeholder="Tipo IGV" name="idimpuesto" formControlName="idimpuesto">
+            <mat-option [value]="null">Seleccione</mat-option>
+            <mat-option *ngFor="let item of _data.impuestos" [value]="item.idimpuesto">
+              {{ item.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="itemForm.get('idimpuesto').hasError('required')">
+            Requerido!
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field fxFlex="auto">
+          <mat-label>Stock actual disponible</mat-label>
+          <input matInput [formControl]="stock">
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" fxFlex="auto">
+          <mat-label>Cantidad</mat-label>
+          <input matInput type="number" formControlName="cantidad">
+          <mat-error *ngIf="itemForm.get('cantidad').hasError('required')">
+            Requerido!
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="standard" fxFlex="auto">
+          <mat-label>Precio unitario</mat-label>
+          <input matInput type="number" formControlName="preciounit">
+          <mat-error *ngIf="itemForm.get('preciounit').hasError('required')">
+            Requerido!
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="standard" fxFlex="auto">
+          <mat-label>Descuento sin IGV(Opcional)</mat-label>
+          <input matInput type="number" formControlName="descuento">
+          <mat-error *ngIf="itemForm.get('descuento').hasError('required')">
+            Requerido!
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+        <mat-form-field appearance="standard" fxFlex="auto">
+          <mat-label>Sub total</mat-label>
+          <input matInput type="number" name="valorventa" formControlName="valorventa" [readonly]="true">
+        </mat-form-field>
+
+        <mat-form-field appearance="standard" fxFlex="auto">
+          <mat-label>Igv</mat-label>
+          <input matInput type="number" name="montototalimpuestos" formControlName="montototalimpuestos"
+            [readonly]="true">
+        </mat-form-field>
+
+        <mat-form-field appearance="standard" fxFlex="auto">
+          <mat-label>Total</mat-label>
+          <input matInput type="number" name="total" formControlName="total" [readonly]="true">
+        </mat-form-field>
+      </div>
+    </fieldset>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button color="primary" mat-button type="submit" [disabled]="itemForm.invalid">GUARDAR</button>
+  </mat-dialog-actions>
+</form>

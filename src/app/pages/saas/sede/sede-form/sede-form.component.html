@@ -1,0 +1,260 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<form [formGroup]="sedeForm" (ngSubmit)="save()" *ngIf="!loading">
+
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">{{dialogTitle}}</h2>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" matTooltip="Cerrar">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <mat-tab-group fxFlex="auto" #tabGroup (selectedTabChange)="handleTabChange($event)"
+      [selectedIndex]="activeTabIndex" [color]="'accent'" [backgroundColor]="'primary'">
+      <mat-tab label="LOCAL"></mat-tab>
+      <mat-tab label="IMPRESIÓN" *ngIf="sedeForm.get('comercial').value"></mat-tab>
+      <mat-tab label="JSON" *ngIf="sedeForm.get('comercial').value"></mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+    <div *ngIf="activeTabIndex === 0">
+      <fieldset fxLayout="column">
+        <legend>Local</legend>
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="50">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" #nombre required>
+            <mat-error *ngIf="sedeForm.get('nombre').hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+          <div fxLayout="row" fxLayoutGap="16px" fxFlex="50">
+            <mat-form-field appearance="standard" floatLabel="always" class="vex-flex-form-field" fxFlex="auto">
+              <mat-label>Código local</mat-label>
+              <input matInput formControlName="abreviatura" maxlength="7">
+            </mat-form-field>
+
+            <mat-form-field appearance="standard" floatLabel="always" class="vex-flex-form-field" fxFlex="auto"
+              hintLabel="4 a 6 caracteres">
+              <mat-label>Código Sunat</mat-label>
+              <input matInput formControlName="codigosunat" maxlength="6" required>
+              <mat-error *ngIf="sedeForm.get('codigosunat').hasError('required')">
+                Es requerido
+              </mat-error>
+              <mat-error *ngIf="sedeForm.get('codigosunat').hasError('minlength')">
+                <!-- Mínimo {{ sedeForm.get('codigosunat').errors.minlength.requiredLength }} caracteres -->
+                4 o 6 caracteres
+              </mat-error>
+              <mat-error *ngIf="sedeForm.get('codigosunat').hasError('maxlength')">
+                4 o 6 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Departamento</mat-label>
+            <mat-select formControlName="ubigeodepa" required>
+              <mat-option *ngFor="let item of departamentos" [value]="item.id">
+                {{ item.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="sedeForm.get('ubigeodepa').hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Provincia</mat-label>
+            <mat-select formControlName="ubigeoprov" required>
+              <mat-option *ngFor="let item of provincias" [value]="item.id">
+                {{ item.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="sedeForm.get('ubigeoprov').hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Distrito</mat-label>
+            <mat-select formControlName="ubigeo" required>
+              <mat-option *ngFor="let item of distritos" [value]="item.id">
+                {{ item.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="sedeForm.get('ubigeo').hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="standard" floatLabel="always">
+          <mat-label>Dirección local</mat-label>
+          <input matInput formControlName="direccion" required>
+          <mat-error *ngIf="sedeForm.get('direccion').hasError('required')">
+            Es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <mat-slide-toggle formControlName="comercial" labelPosition="after">Local comercial
+          </mat-slide-toggle>
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-4 mb-1" *ngIf="sedeForm.get('comercial').value">
+        <legend>Comprobante y series</legend>
+        <div formArrayName="comprobantes">
+          <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+            fxLayoutGap="8px" fxLayoutGap.lt-sm="0">
+            <div fxFlex="60">Comprobante</div>
+            <div fxFlex="15">Serie</div>
+            <div fxFlex="15">Número</div>
+            <div fxFlex="13" class="text-center">Contingencia</div>
+            <div fxFlex="7" class="text-center">
+              <button type="button" mat-mini-fab (click)="addItem()" matTooltip="Agregar comprobante" color="accent">
+                <mat-icon [icIcon]="icAdd"></mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+            fxLayoutGap="8px" fxLayoutGap.lt-sm="0"
+            *ngFor="let city of sedeForm.get('comprobantes')['controls']; index as i" [formGroupName]="i">
+
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="60" class="vex-flex-form-field">
+              <mat-label>Comprobante</mat-label>
+              <mat-select placeholder="Comprobante" name="iddocumentofiscal" formControlName="iddocumentofiscal">
+                <mat-option *ngFor="let item of documentos" [value]="item.iddocumentofiscal">
+                  {{ item.nombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error
+                *ngIf="sedeForm.get('comprobantes')['controls'][i].controls['iddocumentofiscal'].hasError('required')">
+                Es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="15" class="vex-flex-form-field"
+              hintLabel="4 caracteres">
+              <mat-label>serie</mat-label>
+              <input matInput formControlName="serie">
+              <mat-error *ngIf="sedeForm.get('comprobantes')['controls'][i].controls['serie'].hasError('required')">
+                Es requerido
+              </mat-error>
+              <mat-error *ngIf="sedeForm.get('comprobantes')['controls'][i].controls['serie'].hasError('minlength')">
+                4 caracteres
+              </mat-error>
+              <mat-error *ngIf="sedeForm.get('comprobantes')['controls'][i].controls['serie'].hasError('maxlength')">
+                4 caracteres
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="standard" floatLabel="always" fxFlex="15" class="vex-flex-form-field">
+              <mat-label>Número</mat-label>
+              <input matInput type="number" formControlName="numero">
+              <mat-error *ngIf="sedeForm.get('comprobantes')['controls'][i].controls['numero'].hasError('required')">
+                Es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <div fxFlex="13" class="text-center">
+              <mat-slide-toggle formControlName="contingencia">
+              </mat-slide-toggle>
+            </div>
+
+            <div fxFlex="7" class="text-center">
+              <button type="button" mat-icon-button color="warn" (click)="deleteItem(i)" matTooltip="Eliminar">
+                <mat-icon [icIcon]="icDelete"></mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="borde text-center">
+            <!--  *ngIf="xxx.controls.length === 0" -->
+            <button type="button" mat-button color="accent" (click)="addItem()">
+              <mat-icon [icIcon]="icAdd"></mat-icon> Agregar comprobante
+            </button>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <div *ngIf="activeTabIndex === 1">
+      <fieldset fxLayout="column">
+        <legend>Formato de impresión</legend>
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Factura</mat-label>
+            <mat-select formControlName="pdffactura" required>
+              <mat-option *ngFor="let item of formatos" [value]="item.id">
+                {{ item.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="sedeForm.get('pdffactura').hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="auto">
+            <mat-label>Boleta de venta</mat-label>
+            <mat-select formControlName="pdfboleta" required>
+              <mat-option *ngFor="let item of formatos" [value]="item.id">
+                {{ item.nombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="sedeForm.get('pdfboleta').hasError('required')">
+              Es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </fieldset>
+
+      <fieldset fxLayout="column" class="mt-4">
+        <legend>Texto en cabecera de PDF(Ejemplo: Teléfono, email, página web Etc.)</legend>
+        <mat-form-field appearance="standard" floatLabel="always">
+          <!-- <mat-label>Cabecera</mat-label> -->
+          <input matInput formControlName="pdfcabecera">
+        </mat-form-field>
+      </fieldset>
+
+      <fieldset fxLayout="column" class="mt-4">
+        <legend>Razón comercial para este local (Se muestra en el PDF solo si no hay logotipo)</legend>
+        <mat-form-field appearance="standard" floatLabel="always">
+          <!-- <mat-label>Nombre</mat-label> -->
+          <input matInput name="pdfnombre" formControlName="pdfnombre">
+        </mat-form-field>
+      </fieldset>
+
+      <fieldset fxLayout="column" class="mt-4">
+        <legend>Color base de PDF</legend>
+
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+          <mat-form-field appearance="standard" floatLabel="always" fxFlex="33">
+            <mat-label>Color</mat-label>
+            <mat-select formControlName="pdfcolor" panelClass="example-panel-rojo">
+              <mat-option value="98,0,238">Lila</mat-option>
+              <mat-option value="0,92,184">Azul</mat-option>
+              <mat-option value="35,47,52">Plomo</mat-option>
+              <mat-option value="227,4,37">Rojo</mat-option>
+              <mat-option value="114,13,93">Purpura</mat-option>
+              <mat-option value="0,175,65">Verde</mat-option>
+              <mat-option value="191,54,12">Anaranjado</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </fieldset>
+    </div>
+
+    <div *ngIf="activeTabIndex === 2">
+      <pre>{{sedeForm.get('pdfcolor').value}}</pre>
+      <pre>{{sedeForm.value | json}}</pre>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CERRAR</button>
+    <button mat-raised-button type="submit" color="primary" [disabled]="sedeForm.invalid || submitted">GUARDAR</button>
+  </mat-dialog-actions>
+</form>

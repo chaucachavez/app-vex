@@ -1,0 +1,22 @@
+{
+    "/pdf/*": {
+        "target": "https://app.akmconsultoresjuridicocontantable.com",
+        "secure": false,
+        "changeOrigin": true
+    },
+    "/xml/*": {
+        "target": "https://app.akmconsultoresjuridicocontantable.com",
+        "secure": false,
+        "changeOrigin": true
+    },
+    "/cdr/*": {
+        "target": "https://app.akmconsultoresjuridicocontantable.com",
+        "secure": false,
+        "changeOrigin": true
+    },
+    "/cpe/*": {
+        "target": "https://www.pse.pe",
+        "secure": false,
+        "changeOrigin": true
+    }
+}

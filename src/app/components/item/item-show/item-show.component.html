@@ -1,0 +1,106 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<div *ngIf="!loading">
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">{{producto.nombre}}</h2>
+      <button class="text-secondary" mat-icon-button type="button" (click)="matDialogRef.close('delete')"
+        matTooltip="Eliminar">
+        <mat-icon [icIcon]="icDelete"></mat-icon>
+      </button>
+      <button class="text-secondary" mat-icon-button type="button" (click)="matDialogRef.close('edit')"
+        matTooltip="Editar">
+        <mat-icon [icIcon]="icEdit"></mat-icon>
+      </button>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" matTooltip="Cerrar">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+    <fieldset>
+      <legend>Producto</legend>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="20">Nombre</div>
+        <div fxFlex="80">{{producto.nombre}}</div>
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="20">Medida</div>
+        <div fxFlex="40">{{producto.unidad?.codigo}} - {{producto.unidad?.nombre}}</div>
+        <div fxFlex="20">Sku</div>
+        <div fxFlex="20">{{producto.codigo}}</div>
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="20">Código Sunat</div>
+        <div fxFlex="40">{{producto.catalogo?.codigo}} - {{producto.catalogo?.nombre}}</div>
+        <div fxFlex="20">Impuesto venta</div>
+        <div fxFlex="20" [ngSwitch]="producto.idimpuesto">
+          <span *ngSwitchCase="1">Igv</span>
+          <span *ngSwitchCase="2">Gratuita</span>
+          <span *ngSwitchCase="3">Gratuita</span>
+          <span *ngSwitchCase="4">Gratuita</span>
+          <span *ngSwitchCase="5">Gratuita</span>
+          <span *ngSwitchCase="6">Gratuita</span>
+          <span *ngSwitchCase="7">Gratuita</span>
+          <span *ngSwitchCase="8">Exonerado</span>
+          <span *ngSwitchCase="9">Inafecto</span>
+          <span *ngSwitchCase="10">Gratuita</span>
+          <span *ngSwitchCase="11">Gratuita</span>
+          <span *ngSwitchCase="12">Gratuita</span>
+          <span *ngSwitchCase="13">Gratuita</span>
+          <span *ngSwitchCase="14">Gratuita</span>
+          <span *ngSwitchCase="15">Gratuita</span>
+          <span *ngSwitchCase="16">Exportación</span>
+        </div>
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="20">Categoria</div>
+        <div fxFlex="80">{{producto.categoria?.codigo}} - {{producto.categoria?.nombre}}</div>
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start" *ngIf="producto.destacado === '1'">
+        <div fxFlex="20">Destacado</div>
+        <div fxFlex="30">
+          <mat-icon [icIcon]=" icCheck" size="18px"></mat-icon>
+        </div>
+      </div>
+    </fieldset>
+    <fieldset class="mt-4">
+        <legend>Precio unitario</legend>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="10">Moneda</div>
+        <div fxFlex="20">{{producto.moneda}}</div>
+        <div fxFlex="25">Valor venta sin igv</div>
+        <div fxFlex="10">{{producto.costoventa}}</div>
+        <div fxFlex="25">Precio venta con igv</div>
+        <div fxFlex="10">{{producto.valorventa}}</div>
+      </div>
+    </fieldset>
+    <!-- <fieldset class="mt-4" *ngIf="producto.inventario === '1'">
+      <legend>Ítem sujeto a inventario</legend>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="20" >Cantidad inicial</div>
+        <div fxFlex="30">
+          {{producto.stockinicial}}
+        </div>
+        <div fxFlex="20" >Inventario</div>
+        <div fxFlex="30">
+          {{producto.stockactual}}
+        </div>
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="20" >Costo unidad</div>
+        <div fxFlex="30">
+          {{producto.valorunit}}
+        </div>
+      </div>
+    </fieldset> -->
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close aria-label="CERRAR">
+      CERRAR
+    </button>
+  </mat-dialog-actions>
+
+</div>

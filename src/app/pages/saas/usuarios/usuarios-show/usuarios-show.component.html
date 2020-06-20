@@ -1,0 +1,101 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<div *ngIf="!loading">
+
+  <div mat-dialog-title fxLayout="column">
+    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
+      <h2 class="headline m-0" fxFlex="auto">{{usuario.name}}</h2>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button"
+        (click)="matDialogRef.close('delete')" matTooltip="Eliminar">
+        <mat-icon [icIcon]="icDelete"></mat-icon>
+      </button>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button"
+        (click)="matDialogRef.close('edit')" matTooltip="Editar">
+        <mat-icon [icIcon]="icEdit"></mat-icon>
+      </button>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" (click)="matDialogRef.close()" matTooltip="Cerrar">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-dialog-content fxLayout="column">
+    <fieldset>
+      <legend>Usuario</legend>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="20" class="font-weight-700">Correo</div>
+        <div fxFlex="70">
+          <mat-icon [icIcon]="icEmail" class="mr-1"></mat-icon>
+          {{usuario.email}}
+        </div>
+
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="20" class="font-weight-700">Nombre completo</div>
+        <div fxFlex="70">
+          <mat-icon [icIcon]="icPerson" class="mr-1"></mat-icon>
+          {{usuario.name}}
+        </div>
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="start start">
+        <div fxFlex="20" class="font-weight-700">Teléfono</div>
+        <div fxFlex="60">
+          <mat-icon [icIcon]="icPhone" class="mr-1"></mat-icon>
+          {{usuario.celular}}
+        </div>
+        <div fxFlex="10" class="font-weight-700">Activo?</div>
+        <div fxFlex="10">
+          <span *ngIf="usuario.acceso === '1'">Si</span>
+          <span *ngIf="usuario.acceso !== '1'">No</span>
+        </div> -
+      </div>
+
+    </fieldset>
+
+    <fieldset class="mt-4">
+      <legend>Local asignado</legend>
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+        fxLayoutGap="8px" fxLayoutGap.lt-sm="0">
+        <div fxFlex="30">Local</div>
+        <div fxFlex="70">Dirección</div>
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+        fxLayoutGap="8px" fxLayoutGap.lt-sm="0" *ngFor="let item of usuario.sedes" class="b-t-1">
+        <div fxFlex="30">{{item.nombre}}</div>
+        <div fxFlex="70">{{item.direccion}}</div>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+        *ngIf="usuario.sedes.length === 0">
+        <div fxFlex>No hay registros.</div>
+      </div>
+    </fieldset>
+
+    <fieldset class="mt-4">
+      <legend>Permisos para este usuario</legend>
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+        fxLayoutGap="8px" fxLayoutGap.lt-sm="0">
+        <div fxFlex="30">Opción</div>
+        <div fxFlex="70">Permisos</div>
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+        fxLayoutGap="8px" fxLayoutGap.lt-sm="0" *ngFor="let item of usuario.modulos" class="b-t-1">
+        <div fxFlex="30">{{item.nombre}}</div>
+        <div fxFlex="70" *ngIf="item.modulo_users.permiso === 'L'">Solo ver</div>
+        <div fxFlex="70" *ngIf="item.modulo_users.permiso === 'E'">Ver, Crear y Modificar</div>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start stretch"
+        *ngIf="usuario.modulos.length === 0">
+        <div fxFlex>No hay registros.</div>
+      </div>
+    </fieldset>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close aria-label="CERRAR">
+      CERRAR
+    </button>
+  </mat-dialog-actions>
+
+</div>

@@ -1,0 +1,179 @@
+<vex-loading *ngIf="loading"></vex-loading>
+
+<form [formGroup]="presupuestoForm" (ngSubmit)="save()" *ngIf="!loading">
+  <div class="dialog-content-wrapper">
+
+    <div mat-dialog-title class="m-0">
+      <mat-toolbar class="primary">
+        <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
+          <span>{{dialogTitle}} {{ciclo.fecha | date:'d MMMM, y'}}</span>
+          <div fxLayout="row" fxLayoutAlign="end center">
+            <button mat-icon-button type="button" (click)="matDialogRef.close()" aria-label="Close">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </mat-toolbar-row>
+      </mat-toolbar>
+    </div>
+
+    <div mat-dialog-content class="p-0 m-0" fusePerfectScrollbar>
+      <div fxLayout="column" class="p-16" fxFlex>
+        <div fxFlex="1 0 auto" fxLayout="column" fxLayout.gt-xs="row">
+          <div formArrayName="presupuestodet" fxFlex="100">
+            <fieldset>
+              <legend>Tratamientos</legend>
+              <!-- <div class="border"> -->
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 15%">Cantidad</th>
+                    <th style="width: 50%">Descripción</th>
+                    <!-- <th style="width: 10%" class="text-center">Cliente</th>
+                    <th style="width: 10%" class="text-center">Pagada</th> -->
+                    <th style="width: 15%" class="text-center">Por pagar</th>
+                    <th style="width: 10%" class="text-right">P.unit.</th>
+                    <th style="width: 10%" class="text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of presupuestodet.controls; index as i" [formGroupName]="i">
+                    <td>
+                      <mat-form-field class="p-0 m-0" style="width: 70px;">
+                        <input matInput type="number" formControlName="cantidad">
+                        <mat-error *ngIf="item.get('cantidad').hasError('min')">
+                          Mínimo {{item.get('cantidad').errors.min.min}}
+                        </mat-error>
+                        <mat-error *ngIf="item.get('cantidad').hasError('max')">
+                          Máximo {{item.get('cantidad').errors.max.max}}
+                        </mat-error>
+                      </mat-form-field>
+                    </td>
+                    <td>
+                      {{item.get('producto').value.nombre}}
+                    </td>
+                    <!-- <td class="text-center">
+                      {{item.get('cantidadcliente').value}}
+                    </td>
+                    <td class="text-center">
+                      {{item.get('cantidadpagada').value}}
+                    </td> -->
+                    <td class="text-center">
+                      {{item.get('cantidadcliente').value - item.get('cantidadpagada').value}}
+                    </td>
+                    <td class="text-right">
+                      {{item.get('preciounit').value | number : '1.2-2'}}
+                    </td>
+                    <td class="text-right">
+                      <!-- {{item.get('total').value}} -->
+                      {{(item.get('cantidad').value * item.get('preciounit').value) | number : '1.2-2'}}
+                    </td>
+                  </tr>
+                  <tr *ngIf="presupuestodet.controls.length === 0">
+                    <td colspan="6" class="text-center">
+                      No hay registros.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div fxLayout="row" fxLayoutAlign="end center">
+                <div fxFlex class="text-right">
+                  {{presupuestoForm.get('tratamiento').value | number : '1.2-2'}}
+                </div>
+              </div>
+            </fieldset>
+
+          </div>
+        </div>
+
+        <div fxFlex="1 0 auto" fxLayout="column" fxLayout.gt-xs="row">
+          <div fxFlex="50">
+            <fieldset class="mt-8">
+              <legend>Información de presupuesto</legend>
+              <div fxLayout="row" fxLayoutAlign="space-between center">
+                <div>Costo total del presupuesto</div>
+                <div>{{presupuestoForm.get('presupuesto').value | number : '1.2-2'}}</div>
+              </div>
+              <div fxLayout="row" fxLayoutAlign="space-between center">
+                <div>Pagos realizados </div>
+                <div>{{presupuestoForm.get('pago').value | number : '1.2-2'}}</div>
+              </div>
+              <mat-divider></mat-divider>
+              <div fxLayout="row" fxLayoutAlign="space-between center">
+                <div>Por pagar</div>
+                <div>{{presupuestoForm.get('porpagar').value | number : '1.2-2'}}</div>
+              </div>
+            </fieldset>
+          </div>
+          <div fxFlex="50" *ngIf="ACUENTAVENTA_VENTA">
+            <fieldset class="mt-8">
+              <legend>Acuentas y descuentos(Opcional)</legend>
+              <!-- <div fxLayout="row" fxLayoutAlign="space-between center">
+                <div>Tratamientos</div>
+                <div>
+                  <mat-form-field>
+                    <input matInput type="number" name="tratamiento" formControlName="tratamiento">
+                  </mat-form-field>
+                </div>
+              </div> -->
+              <div fxLayout="row" fxLayoutAlign="space-between center">
+                <div>Acuenta</div>
+                <div>
+                  <mat-form-field>
+                    <input matInput type="number" name="acuenta" formControlName="acuenta">
+                    <mat-error *ngIf="presupuestoForm.get('acuenta').hasError('required')">
+                      Es requerido
+                    </mat-error>
+                    <mat-error *ngIf="presupuestoForm.get('acuenta').hasError('min')">
+                      Mínimo valor {{ presupuestoForm.get('acuenta').errors.min.min}}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutAlign="space-between center">
+                <div>Descuento</div>
+                <div>
+                  <mat-form-field>
+                    <input matInput type="number" name="descuento" formControlName="descuento">
+                    <mat-error *ngIf="presupuestoForm.get('descuento').hasError('required')">
+                      Es requerido
+                    </mat-error>
+                    <mat-error *ngIf="presupuestoForm.get('descuento').hasError('min')">
+                      Mínimo valor {{ presupuestoForm.get('acuenta').errors.min.min}}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <!-- <mat-divider></mat-divider>
+              <div fxLayout="row" fxLayoutAlign="space-between center">
+                <div>
+                  <strong>Total</strong>
+                </div>
+                <div>
+                  <mat-form-field>
+                    <input matInput type="number" name="total" formControlName="total">
+                  </mat-form-field>
+                </div>
+              </div> -->
+            </fieldset>
+          </div>
+        </div>
+        <!-- <div fxFlex="1 0 auto" fxLayout="column" fxLayout.gt-xs="row">
+          {{presupuestoForm.value | json}}
+        </div> -->
+        <!-- <div fxFlex="1 0 auto" fxLayout="column" fxLayout.gt-xs="row">
+          <pre>{{presupuestoForm.get('presupuestodet').value | json}}</pre>
+        </div> -->
+      </div>
+    </div>
+
+    <div mat-dialog-actions class="p-16 m-0" fxLayout="row" fxLayoutAlign="end center">
+      <button mat-button type="button" (click)="matDialogRef.close()" class="mr-8" aria-label="CANCELAR" color="accent">
+        CERRAR
+      </button>
+      <button mat-raised-button type="submit" class="accent" [disabled]="presupuestoForm.invalid || submitted"
+        aria-label="GUARDAR">
+        ACEPTAR
+      </button>
+    </div>
+  </div>
+</form>

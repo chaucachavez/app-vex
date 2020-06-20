@@ -1,0 +1,54 @@
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <!-- <span *ngIf="sedeActual">{{sedeActual.nombre}} </span> | <span> Inicio</span> -->
+    <span> Inicio</span>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+
+
+<div class="text-left mt-6 mb-8 container" gdAlignColumns="start start" gdColumns="1fr 1fr" gdColumns.lt-md="1fr"
+  gdGap="24px">
+
+  <!-- <pre>{{sedes | json}}</pre> -->
+  <!-- <pre>{{modulos | json}}</pre> -->
+
+  <!-- <mat-card @fadeInUp class="card max-w-full overflow-hidden p-3">
+    <mat-card-header>
+      <mat-card-title><small>Opciones</small></mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-nav-list>
+        <a mat-list-item [routerLink]="item.route" *ngFor="let item of modulos">
+          <mat-icon [icIcon]="item.icon"></mat-icon>
+          <h4 mat-line>{{item.label}}</h4>
+          <mat-divider></mat-divider>
+        </a>
+      </mat-nav-list>
+    </mat-card-content>
+  </mat-card> -->
+
+  <div class="h-full" fxLayout="column">
+    <!-- <div @stagger class="overflow-y-auto" fxFlex="auto"> -->
+    <div vexContainer gdColumns="1fr 1fr 1fr 1fr" gdColumns.lt-md="1fr 1fr" gdColumns.xs="1fr" gdGap="12px">
+      <div class="card overflow-hidden trans-ease-out hover:bg-hover cursor-pointer" *ngFor="let item of modulos"
+        [routerLink]="item.route" matRipple>
+        <div class="p-4 text-center relative">
+          <ic-icon [icon]="item.icon" size="48px"></ic-icon>
+          <h5 class="mb-1 mt-3">{{item.label}}</h5>
+        </div>
+      </div>
+    </div>
+    <!-- </div> -->
+  </div>
+
+  <mat-card @fadeInUp class="card max-w-full overflow-hidden p-3">
+    <mat-card-header>
+      <mat-card-title><small>Operaciones por meses</small></mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <img mat-card-image src="assets/img/demo/2.jpg">
+    </mat-card-content>
+  </mat-card>
+
+</div>

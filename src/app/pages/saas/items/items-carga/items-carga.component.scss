@@ -1,0 +1,20 @@
+.itemscarga-form-dialog {
+    @screen sm {
+        width: 100%;
+    }
+
+    @screen md {
+        width: 480px;
+    }
+
+    fieldset {
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        line-height: 24px;
+        padding: 8px;
+
+        legend {
+            padding: 0px 8px 0px 8px;
+        }
+    }
+}
