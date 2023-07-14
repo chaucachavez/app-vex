@@ -36,7 +36,7 @@
     "date-fns": "^2.12.0",
     "file-saver": "^2.0.2",
     "highlight.js": "^10.0.0",
-    "luxon": "^1.23.0",
+    "luxon": "^1.28.1",
     "ngx-countdown": "^9.0.1",
     "ngx-quill": "^8.1.7",
     "ngx-showdown": "~5.1.0",
